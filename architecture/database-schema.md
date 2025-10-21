@@ -89,18 +89,22 @@
 
 #### `tenants`
 
-Primary entity representing a business (store/restaurant).
+Primary entity representing a business/brand (can manage multiple locations for chains).
 
 ```sql
 CREATE TABLE tenants (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     
     -- Business Information
-    business_name VARCHAR(255) NOT NULL,
+    business_name VARCHAR(255) NOT NULL, -- Brand/chain name (e.g., "Highlands Coffee")
     business_type VARCHAR(100), -- 'restaurant', 'cafe', 'street_food', 'bakery', etc.
     slug VARCHAR(100) UNIQUE NOT NULL, -- for subdomain: {slug}.ourplatform.com
     
-    -- Contact & Location
+    -- Chain Configuration
+    is_chain BOOLEAN DEFAULT false, -- true if managing multiple locations
+    total_locations INT DEFAULT 1, -- count of active locations
+    
+    -- Contact & Location (headquarters for chains)
     phone VARCHAR(50),
     email VARCHAR(255),
     address TEXT,
@@ -128,6 +132,94 @@ CREATE TABLE tenants (
 
 CREATE INDEX idx_tenants_slug ON tenants(slug) WHERE deleted_at IS NULL;
 CREATE INDEX idx_tenants_status ON tenants(status) WHERE deleted_at IS NULL;
+CREATE INDEX idx_tenants_is_chain ON tenants(is_chain) WHERE deleted_at IS NULL;
+```
+
+#### `locations`
+
+**NEW:** Individual store locations for chains. Single-location tenants have 1 default location.
+
+```sql
+CREATE TABLE locations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    
+    -- Location Identity
+    location_name VARCHAR(255) NOT NULL, -- e.g., "Highlands Coffee - Nguyễn Huệ"
+    location_code VARCHAR(50), -- Internal code: "HCF-HCM-001"
+    slug VARCHAR(100) NOT NULL, -- URL-friendly: "nguyen-hue"
+    
+    -- Address
+    address TEXT NOT NULL,
+    city VARCHAR(100),
+    district VARCHAR(100), -- Quận/Huyện
+    ward VARCHAR(100), -- Phường/Xã
+    province VARCHAR(100),
+    postal_code VARCHAR(20),
+    
+    -- Geo-coordinates (for mapping, delivery radius)
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8),
+    
+    -- Contact
+    phone VARCHAR(50),
+    manager_name VARCHAR(255),
+    manager_phone VARCHAR(50),
+    
+    -- Operating Hours (JSON for flexibility)
+    operating_hours JSONB DEFAULT '{
+      "monday": {"open": "08:00", "close": "22:00"},
+      "tuesday": {"open": "08:00", "close": "22:00"},
+      "wednesday": {"open": "08:00", "close": "22:00"},
+      "thursday": {"open": "08:00", "close": "22:00"},
+      "friday": {"open": "08:00", "close": "22:00"},
+      "saturday": {"open": "08:00", "close": "23:00"},
+      "sunday": {"open": "08:00", "close": "23:00"}
+    }',
+    
+    -- Status
+    is_active BOOLEAN DEFAULT true,
+    is_primary BOOLEAN DEFAULT false, -- Flagship/headquarters location
+    opened_at DATE, -- Store opening date
+    closed_at DATE, -- If permanently closed
+    
+    -- Display
+    display_order INT DEFAULT 0, -- For sorting in location selector
+    
+    -- Timestamps
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
+    
+    CONSTRAINT unique_tenant_slug UNIQUE (tenant_id, slug),
+    CONSTRAINT unique_location_code UNIQUE (tenant_id, location_code)
+);
+
+CREATE INDEX idx_locations_tenant_id ON locations(tenant_id, is_active) WHERE deleted_at IS NULL;
+CREATE INDEX idx_locations_slug ON locations(tenant_id, slug) WHERE deleted_at IS NULL;
+CREATE INDEX idx_locations_geo ON locations(latitude, longitude) WHERE deleted_at IS NULL;
+CREATE INDEX idx_locations_city ON locations(city, province) WHERE deleted_at IS NULL;
+
+-- Trigger to update tenant.total_locations count
+CREATE OR REPLACE FUNCTION update_tenant_location_count()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE tenants 
+  SET total_locations = (
+    SELECT COUNT(*) 
+    FROM locations 
+    WHERE tenant_id = NEW.tenant_id 
+      AND is_active = true 
+      AND deleted_at IS NULL
+  )
+  WHERE id = NEW.tenant_id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_location_count
+AFTER INSERT OR UPDATE OR DELETE ON locations
+FOR EACH ROW EXECUTE FUNCTION update_tenant_location_count();
 ```
 
 #### `users`
@@ -141,10 +233,12 @@ CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     
-    -- Authentication
-    email VARCHAR(255) UNIQUE,
-    email_verified_at TIMESTAMP,
+    -- Authentication (phone is primary)
+    phone VARCHAR(50) NOT NULL, -- Primary authentication method
+    phone_verified_at TIMESTAMP NOT NULL,
     password_hash VARCHAR(255), -- nullable for social-only auth
+    email VARCHAR(255), -- Optional, can be null
+    email_verified_at TIMESTAMP,
     
     -- Social Auth
     zalo_id VARCHAR(255) UNIQUE,
@@ -152,7 +246,6 @@ CREATE TABLE users (
     
     -- Profile
     full_name VARCHAR(255) NOT NULL,
-    phone VARCHAR(50),
     avatar_url TEXT,
     locale VARCHAR(10) DEFAULT 'vi-VN',
     
@@ -167,11 +260,14 @@ CREATE TABLE users (
     -- Timestamps
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP
+    deleted_at TIMESTAMP,
+    
+    CONSTRAINT unique_phone UNIQUE (phone)
 );
 
 CREATE INDEX idx_users_tenant_id ON users(tenant_id) WHERE deleted_at IS NULL;
-CREATE INDEX idx_users_email ON users(email) WHERE deleted_at IS NULL;
+CREATE INDEX idx_users_phone ON users(phone) WHERE deleted_at IS NULL;
+CREATE INDEX idx_users_email ON users(email) WHERE email IS NOT NULL AND deleted_at IS NULL;
 CREATE INDEX idx_users_zalo_id ON users(zalo_id) WHERE zalo_id IS NOT NULL;
 CREATE INDEX idx_users_facebook_id ON users(facebook_id) WHERE facebook_id IS NOT NULL;
 ```
@@ -280,7 +376,11 @@ CREATE TYPE item_status_enum AS ENUM ('draft', 'published', 'archived', 'out_of_
 CREATE TABLE menu_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    location_id UUID REFERENCES locations(id) ON DELETE CASCADE, -- NEW: Location-specific items
     category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
+    
+    -- Location Scope
+    is_chain_wide BOOLEAN DEFAULT false, -- true = available at all locations, false = specific location only
     
     -- Content
     name_vi VARCHAR(255) NOT NULL,
@@ -288,15 +388,15 @@ CREATE TABLE menu_items (
     description_vi TEXT,
     description_en TEXT,
     
-    -- Pricing
+    -- Pricing (can vary by location)
     base_price DECIMAL(10, 2) NOT NULL CHECK (base_price >= 0),
     compare_at_price DECIMAL(10, 2) CHECK (compare_at_price >= base_price), -- for discounts
     currency_code CHAR(3) DEFAULT 'VND',
     
-    -- Inventory
+    -- Inventory (location-specific for chains)
     sku VARCHAR(100), -- Stock Keeping Unit (mã sản phẩm): unique code for inventory tracking, POS integration
     track_inventory BOOLEAN DEFAULT false,
-    stock_quantity INT,
+    stock_quantity INT, -- Per-location inventory count
     low_stock_threshold INT,
     
     -- Display & Media
@@ -891,6 +991,6 @@ INSERT INTO menu_items (tenant_id, category_id, name_vi, name_en, description_vi
 
 ---
 
-**Document Ownership:** Đổng Giang Thái
+**Document Ownership:** Tech Lead
 **Review Cadence:** Update after each major feature addition
 **Questions?** Open an issue or ping in #tech-vietnam channel
