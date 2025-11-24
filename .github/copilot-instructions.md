@@ -54,6 +54,17 @@ These instructions tailor GitHub Copilot to the immediate implementation track: 
 - Provide sample data or seeds tailored to Vietnamese cuisine (e.g., phở, cà phê sữa đá) when demonstrating features.
 - After significant changes, log open questions or follow-ups in the knowledge base.
 
+## Implementation Progress Tracking
+- **CRITICAL:** Whenever ANY specification file is modified (in `architecture/`, `planning/`, or `design/`), you MUST review and update `IMPLEMENTATION_PROGRESS.md`
+- Update tracking includes:
+  - Adding new components if specs introduce new features
+  - Updating status symbols (🔴/🟢/✅) if implementation status changes
+  - Adjusting progress percentages
+  - Adding notes about new dependencies or blockers
+  - Updating spec section references if line numbers change significantly
+- This ensures the implementation roadmap stays synchronized with specifications
+- Example commit message: `docs: update implementation progress after adding [feature] spec`
+
 ## Documentation Standards
 - **Markdown linting:** All generated markdown documents MUST pass markdown lint with zero errors. Always include:
   - Blank lines before and after all headings (MD022)
