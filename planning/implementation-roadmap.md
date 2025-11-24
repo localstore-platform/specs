@@ -74,6 +74,7 @@
 - **Owner:** DevOps/Backend Lead
 
 **Deliverables:**
+
 - ✅ Database schema supports multiple locations
 - ✅ APIs accept `location_id` parameter
 - ✅ RLS policies enforce location isolation
@@ -117,6 +118,7 @@
 - **Owner:** Designer
 
 **Deliverables:**
+
 - ✅ Users can add/edit multiple locations
 - ✅ Location selector works across all pages
 - ✅ Onboarding detects chains vs single-location
@@ -181,6 +183,7 @@
   - **Owner:** Frontend Dev
 
 **Deliverables:**
+
 - ✅ Basic analytics dashboard showing today's performance
 - ✅ Cross-location comparison for chains
 - ✅ Manual sales entry working (for MVP without POS)
@@ -235,6 +238,7 @@
   - **Owner:** Product Manager
 
 **Deliverables:**
+
 - ✅ 3-5 types of AI recommendations working
 - ✅ Recommendations display on dashboard
 - ✅ Vietnamese messaging for all recommendation types
@@ -276,6 +280,7 @@
   - **Owner:** Frontend Dev
 
 **Deliverables:**
+
 - ✅ Chains can create chain-wide or location-specific menu items
 - ✅ Inventory tracked separately per location
 - ✅ Location-specific pricing supported
@@ -316,6 +321,7 @@
   - **Owner:** Frontend Dev
 
 **Deliverables:**
+
 - ✅ Subscription tiers reflect chain-focused pricing
 - ✅ Free tier limited to 1 location
 - ✅ Upgrade flow captures intent (payment integration future phase)
@@ -357,6 +363,7 @@
 **Note:** Storefront is 5% effort in this pivot. It's a data collection endpoint, not core value.
 
 **Deliverables:**
+
 - ✅ Basic storefront working for chains (location-aware)
 - ✅ QR codes generated per location
 - ✅ NO ordering system (future phase)
@@ -390,6 +397,7 @@
   - **Owner:** Product Manager
 
 **Deliverables:**
+
 - ✅ All text in Vietnamese, reviewed by native
 - ✅ Sample data ready for demos
 - ✅ Basic user documentation in Vietnamese
@@ -441,6 +449,7 @@
   - **Owner:** Backend Lead
 
 **Deliverables:**
+
 - ✅ >80% test coverage for backend
 - ✅ Performance benchmarks met
 - ✅ Load testing passed (50 chains)
@@ -492,6 +501,7 @@
   - **Owner:** Product Manager
 
 **Deliverables:**
+
 - ✅ Sales deck ready
 - ✅ 10 pilot chains signed up for free trial
 - ✅ Cold outreach campaign started
@@ -501,21 +511,25 @@
 ## Success Metrics (3 Months Post-Launch)
 
 **Customer Acquisition:**
+
 - [ ] 10 pilot chains onboarded (free trial)
 - [ ] 3-5 converting to paid (₫500k-1.5M/month)
 - [ ] <10% churn in first 3 months
 
 **Product Usage:**
+
 - [ ] 80% of chains log sales daily
 - [ ] 60% check dashboard at least 3x/week
 - [ ] 50% of AI recommendations accepted
 
 **Customer Impact:**
+
 - [ ] 1 customer reports 10%+ revenue increase
 - [ ] 1 customer reports 20%+ waste reduction
 - [ ] NPS >40 (acceptable for early product)
 
 **Technical:**
+
 - [ ] Dashboard loads <1s (p95)
 - [ ] 99.5% uptime
 - [ ] Zero data breaches or multi-tenant leaks
@@ -564,7 +578,7 @@
 
 **Grand Total (12 weeks):** ~$47,000
 
-*(Can reduce by 30-40% with offshore developers or part-time roles)*
+*(Can reduce by 30-40% with offshore developers or part-time roles)!*
 
 ---
 
@@ -573,6 +587,7 @@
 ### Risk 1: Development Takes Longer (14-16 weeks instead of 12)
 
 **Mitigation:**
+
 - Cut scope: Remove storefront (focus 100% on dashboard)
 - Hire contractor for specific tasks (UI polish, translations)
 - Extend timeline, communicate transparently to pilot customers
@@ -580,6 +595,7 @@
 ### Risk 2: No Chains Sign Up for Pilot
 
 **Mitigation:**
+
 - Offer aggressive incentives (3 months free Pro + $100 credit)
 - Target single-location owners preparing to expand
 - Pivot messaging: "Prepare for growth now"
@@ -588,6 +604,7 @@
 ### Risk 3: AI Recommendations Aren't Valuable
 
 **Mitigation:**
+
 - Gather qualitative feedback in week 10-12
 - Iterate recommendation types based on feedback
 - Focus on "quick wins" (low stock alerts, slow items)
@@ -596,6 +613,7 @@
 ### Risk 4: Technical Issues (Performance, Bugs)
 
 **Mitigation:**
+
 - Allocate 20% sprint time to bug fixes
 - Prioritize ruthlessly (analytics > storefront)
 - Use feature flags to disable problematic features
@@ -610,7 +628,7 @@
 1. **POS Integration** (automate data collection)
    - Integrate with popular Vietnamese POS systems
    - Real-time sales sync (no manual entry)
-   
+
 2. **ML-Powered Forecasting** (advanced AI)
    - Demand prediction (tomorrow's sales by item)
    - Dynamic pricing suggestions
@@ -638,30 +656,35 @@
 ## Team Roles & Responsibilities
 
 ### Backend Lead
+
 - Database schema design and migrations
 - API architecture and security (RLS)
 - Analytics aggregation workers
 - Performance optimization
 
 ### Backend Dev
+
 - Location CRUD APIs
 - Menu management updates
 - Integration with third-party services
 - Unit/integration tests
 
 ### Frontend Dev
+
 - Location selector and management UI
 - Analytics dashboard (charts, tables)
 - Menu management screens
 - Mobile-responsive design
 
 ### Product Manager (Part-Time)
+
 - Requirements refinement
 - User story writing
 - Pilot customer outreach
 - Vietnamese content creation
 
 ### Designer (Part-Time)
+
 - Wireframes for key screens
 - UI design system
 - Sales deck design
@@ -672,21 +695,25 @@
 ## Communication Plan
 
 ### Daily Standups (15 min)
+
 - What did you do yesterday?
 - What will you do today?
 - Any blockers?
 
 ### Weekly Sprint Planning (2 hours, Monday)
+
 - Review last week's progress
 - Plan this week's tasks
 - Update roadmap if needed
 
 ### Bi-Weekly Stakeholder Updates (30 min)
+
 - Demo progress to CEO/co-founder
 - Review metrics and customer feedback
 - Adjust priorities if needed
 
 ### Monthly Retrospectives (1 hour)
+
 - What went well?
 - What could be improved?
 - Action items for next sprint
@@ -735,7 +762,7 @@ A feature is complete when:
 
 ### Support
 
-- [ ] Support email (support@platform.com) configured
+- [ ] Support email (<support@platform.com>) configured
 - [ ] FAQ page published (top 10 questions)
 - [ ] Internal troubleshooting docs for team
 
