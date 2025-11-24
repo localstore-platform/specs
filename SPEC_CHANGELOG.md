@@ -19,6 +19,64 @@ Each version follows this structure:
 
 ---
 
+## [v1.1-specs] - 2025-11-25
+
+### Added
+
+**Planning Documents:**
+
+- Sprint 0.5 implementation plan (`planning/sprint-0.5-menu-demo.md`)
+  - Demo-first approach aligned with IMPLEMENTATION_STRATEGY_REVISION.md
+  - 9 stories organized into 4 sequential parts
+  - Explicit repository assignments for each story
+  - Flexible timing (no fixed dates/durations)
+  - Focus on menu website + REST API + shared contracts
+  - Mobile-first customer menu display
+  - Vietnamese restaurant seed data
+  - Success criteria for demo readiness
+
+### Changed
+
+**Implementation Progress:**
+
+- Updated `IMPLEMENTATION_PROGRESS.md` to reflect actual repository initialization
+  - Overall progress: 15% → 30%
+  - API repository: 0% → 29% (Docker Compose + RLS + migrations ready)
+  - Menu repository: 0% → 56% (Next.js 16 + Tailwind + Vietnamese locale)
+  - Contracts repository: 0% → 64% (Full documentation + templates)
+  - Added detailed PR #1 accomplishments from all three repos
+  - Recent activity section with commit-level details
+
+**GitHub Configuration:**
+
+- Added repository initialization guide (`.github/REPO_INITIALIZATION_PROMPT.md`)
+  - Comprehensive prompts for each repository type
+  - Template structures for SPEC_LINKS.md per repo
+  - Repository-specific Copilot instructions
+  - Complete example for API repository initialization
+
+### Implementation Repos Compatible
+
+This version is compatible with:
+
+- `api` v0.1.0+ (Repository initialized with Docker Compose)
+- `menu` v0.1.0+ (Repository initialized with Next.js 16)
+- `contracts` v0.1.0+ (Repository initialized with documentation)
+- `mobile` (Pending initialization)
+
+### Notes
+
+- Sprint 0.5 supersedes original Sprint 1 timeline due to demo-first strategy
+- Focus shifted from full MVP to working menu demo first
+- Original Sprint 1 (4-week plan) deferred in favor of incremental approach
+- Implementation now follows: Demo → Authentication → Dashboard → Mobile App
+
+### Breaking Changes
+
+None (additive changes only)
+
+---
+
 ## [v1.0-specs] - 2025-11-25
 
 ### Added
