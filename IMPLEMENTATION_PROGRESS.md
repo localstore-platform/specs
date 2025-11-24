@@ -23,19 +23,26 @@ Biểu đồ này theo dõi tiến độ implementation của từng phần tron
 ## 📊 Overall Progress
 
 ```
-Total Progress: ███░░░░░░░░░░░░░░░░░ 15% (Documentation Complete)
+Total Progress: ██████░░░░░░░░░░░░░░ 30% (Documentation + Foundation)
 
 Development Phases (Revised Strategy):
 ├─ 📋 Documentation      ████████████████████ 100% ✅ Complete
-├─ 🐳 Local Dev Setup    ░░░░░░░░░░░░░░░░░░░░   0% 🔴 Priority 1
-├─ 🌐 Menu Web (Demo)    ░░░░░░░░░░░░░░░░░░░░   0% 🔴 Priority 1  ← FOCUS
-├─ 🔧 Backend API        ░░░░░░░░░░░░░░░░░░░░   0% 🔴 Priority 2
+├─ 🐳 Repo Setup         ████████████████████ 100% ✅ Complete (3/3 core repos)
+├─ 🌐 Menu Web (Demo)    ███████████░░░░░░░░░  56% 🟢 In Progress  ← FOCUS
+├─ 🔧 Backend API        ██████░░░░░░░░░░░░░░  29% 🟢 In Progress (Docker ready)
+├─ 📦 Contracts          █████████████░░░░░░░  64% 🟢 In Progress
 ├─ 📱 Mobile App         ░░░░░░░░░░░░░░░░░░░░   0% 🔴 Priority 3
 ├─ 📊 Basic Analytics    ░░░░░░░░░░░░░░░░░░░░   0% 🔴 Priority 4
 ├─ 🏗️  AWS Deploy        ░░░░░░░░░░░░░░░░░░░░   0% ⏸️  Priority 5
 └─ 🤖 ML Service         ░░░░░░░░░░░░░░░░░░░░   0% ⏸️  Future
 
 Strategy: Demo-first with localhost development, postpone cloud infrastructure
+
+Recent Updates:
+✅ API: Docker Compose + PostgreSQL RLS + migration structure (29% complete)
+✅ Menu: Next.js 16 + Tailwind CSS + Vietnamese locale (56% complete)
+✅ Contracts: Full documentation + templates (64% complete)
+🎯 Next: Implement menu display pages with Vietnamese formatting
 ```
 
 ---
@@ -64,7 +71,9 @@ Strategy: Demo-first with localhost development, postpone cloud infrastructure
 
 ---
 
-## 🔧 Backend API (Repo: `backend-api`)
+## 🔧 Backend API (Repo: `api`)
+
+**Repository:** <https://github.com/localstore-platform/api>
 
 **Spec References:**
 
@@ -73,22 +82,26 @@ Strategy: Demo-first with localhost development, postpone cloud infrastructure
 - `architecture/database-schema.md`
 - `architecture/graphql-schema.md`
 
-**Status:** 🔴 Not Started
+**Status:** 🟢 In Progress (Repository Initialized)
 
 ### Core Infrastructure
 
 | Component | Status | Spec Section | Notes |
 |-----------|--------|--------------|-------|
+| Repository Setup | ✅ Complete | - | SPEC_LINKS.md + Copilot instructions |
+| Docker Compose Setup | ✅ Complete | backend-setup-guide.md:200-400 | PostgreSQL + Redis + API + AI |
+| PostgreSQL Init Scripts | ✅ Complete | backend-setup-guide.md:300-450 | RLS functions (set/get_current_tenant) |
+| Redis Configuration | ✅ Complete | backend-setup-guide.md:450-550 | Docker service configured |
+| Environment Variables | ✅ Complete | - | .env.example with all configs |
 | NestJS Project Setup | 🔴 Not Started | backend-setup-guide.md:1-300 | TypeScript 5 + NestJS 10 |
-| TypeORM Configuration | 🔴 Not Started | backend-setup-guide.md:300-450 | PostgreSQL 14 |
-| Redis Configuration | 🔴 Not Started | backend-setup-guide.md:450-550 | Caching layer |
+| TypeORM Configuration | 🔴 Not Started | backend-setup-guide.md:300-450 | PostgreSQL 14 connection |
 | JWT Authentication | 🔴 Not Started | backend-setup-guide.md:550-650 | Token strategy |
 | GraphQL Apollo Server | 🔴 Not Started | graphql-schema.md:1-100 | Admin dashboard |
 | WebSocket Gateway | 🔴 Not Started | api-specification.md:1800-1900 | Real-time updates |
 | Error Handling Middleware | 🔴 Not Started | backend-setup-guide.md:800-900 | Vietnamese messages |
 | Logging (Winston) | 🔴 Not Started | backend-setup-guide.md:900-1000 | Structured logs |
 
-**Progress:** 0/8 (0%)
+**Progress:** 5/12 (42%)
 
 ### Authentication & Authorization
 
@@ -139,25 +152,27 @@ Strategy: Demo-first with localhost development, postpone cloud infrastructure
 
 | Feature | Status | Spec Section | Notes |
 |---------|--------|--------------|-------|
+| Migration Structure | ✅ Complete | backend-setup-guide.md:400-600 | Folder structure + guidelines |
+| RLS Helper Functions | ✅ Complete | database-schema.md:50-100 | set/get_current_tenant() |
+| Seed Data Patterns | ✅ Complete | backend-setup-guide.md:1650-1730 | Vietnamese examples documented |
 | Initial Migration (Schema) | 🔴 Not Started | database-schema.md:1-100 | Create all tables |
-| RLS Policies Migration | 🔴 Not Started | database-schema.md:50-100 | Enable RLS |
-| Seed Data (Vietnamese) | 🔴 Not Started | backend-setup-guide.md:1650-1730 | Test shop data |
+| RLS Policies Migration | 🔴 Not Started | database-schema.md:50-100 | Enable RLS per table |
 | Indexes & Optimization | 🔴 Not Started | database-schema.md:900-1000 | Performance indexes |
 
-**Progress:** 0/4 (0%)
+**Progress:** 3/6 (50%)
 
-**Backend API Total:** 0/25 (0%)
+**Backend API Total:** 8/28 (29%)
 
 ---
 
-## 🤖 ML Service (Repo: `ml-service`)
+## 🤖 ML Service (Repo: `ml`)
 
 **Spec References:**
 
 - `planning/analytics-ai-strategy.md`
 - `architecture/api-specification.md` (gRPC section)
 
-**Status:** 🔴 Not Started
+**Status:** ⏸️ Paused (Awaiting Pilot Data)
 
 | Component | Status | Spec Section | Notes |
 |-----------|--------|--------------|-------|
@@ -173,14 +188,14 @@ Strategy: Demo-first with localhost development, postpone cloud infrastructure
 
 ---
 
-## 📱 Mobile App (Repo: `mobile-app`)
+## 📱 Mobile App (Repo: `mobile`)
 
 **Spec References:**
 
 - `architecture/flutter-mobile-app-spec.md`
 - `design/wireframes-ux-flow.md`
 
-**Status:** 🔴 Not Started
+**Status:** 🔴 Not Started (Pending Repository Initialization)
 
 ### Core Setup
 
@@ -236,7 +251,42 @@ Strategy: Demo-first with localhost development, postpone cloud infrastructure
 
 ---
 
-## 🌐 Web Admin (Repo: `web-admin`)
+## 🌐 Menu Website (Repo: `menu`)
+
+**Repository:** <https://github.com/localstore-platform/menu>
+
+**Spec References:**
+
+- `architecture/api-specification.md` (Menu endpoints)
+- `design/wireframes-ux-flow.md`
+- `research/vietnam-market-strategy.md`
+
+**Status:** 🟢 In Progress (Repository Initialized, Static Site Created)
+
+| Component | Status | Spec Section | Notes |
+|-----------|--------|--------------|-------|
+| Repository Setup | ✅ Complete | - | SPEC_LINKS.md + Copilot instructions |
+| Next.js 16.0.4 Setup | ✅ Complete | - | App Router + React 18.3.1 |
+| Static Export Config | ✅ Complete | - | Vercel deployment ready |
+| Tailwind CSS 3.4 | ✅ Complete | - | PostCSS + Autoprefixer |
+| Vietnamese Locale | ✅ Complete | - | vi-VN locale in root layout |
+| TypeScript Strict Mode | ✅ Complete | - | Full type safety |
+| VS Code Config | ✅ Complete | - | Tailwind IntelliSense |
+| Environment Variables | ✅ Complete | - | .env.example template |
+| VND Price Utility | ✅ Complete | - | Tailwind utility class |
+| Welcome Page | ✅ Complete | - | Vietnamese content |
+| Menu Display Page | 🔴 Not Started | wireframes-ux-flow.md:200-400 | Customer view |
+| Category Navigation | 🔴 Not Started | - | Filter by category |
+| Item Detail Modal | 🔴 Not Started | - | Price, description |
+| QR Code Landing | 🔴 Not Started | api-specification.md:900-1000 | Session tracking |
+| Mobile Optimization | 🔴 Not Started | - | <2s TTI on 4G |
+| SEO Meta Tags | 🔴 Not Started | - | Local search optimization |
+
+**Progress:** 9/16 (56%)
+
+---
+
+## 🌐 Admin Dashboard (Repo: `dashboard`)
 
 **Spec References:**
 
@@ -261,22 +311,31 @@ Strategy: Demo-first with localhost development, postpone cloud infrastructure
 
 ## 📦 Shared Contracts (Repo: `contracts`)
 
+**Repository:** <https://github.com/localstore-platform/contracts>
+
 **Spec References:**
 
 - `architecture/api-specification.md`
 - `architecture/graphql-schema.md`
 - `architecture/database-schema.md`
 
-**Status:** 🔴 Not Started
+**Status:** 🟢 In Progress (Repository Initialized)
 
 | Component | Status | Spec Section | Notes |
 |-----------|--------|--------------|-------|
+| Repository Setup | ✅ Complete | - | SPEC_LINKS.md + development guide |
+| GitHub Templates | ✅ Complete | - | PR + issue templates |
+| CODEOWNERS | ✅ Complete | - | Contracts team ownership |
+| Copilot Instructions | ✅ Complete | - | Contract-specific guidelines |
+| Development Guide | ✅ Complete | - | DEVELOPMENT.md with workflows |
+| Environment Template | ✅ Complete | - | .env.example |
+| README Documentation | ✅ Complete | - | Enhanced with examples |
 | TypeScript API Types | 🔴 Not Started | api-specification.md | REST DTOs |
 | GraphQL Types | 🔴 Not Started | graphql-schema.md | Schema types |
 | Protobuf Definitions | 🔴 Not Started | api-specification.md:1500-1600 | gRPC contracts |
 | Shared Enums | 🔴 Not Started | database-schema.md | Status, priority |
 
-**Progress:** 0/4 (0%)
+**Progress:** 7/11 (64%)
 
 ---
 
@@ -415,7 +474,49 @@ git commit -m "docs: update implementation progress - [summary of changes]"
 
 **Automation note:** Consider adding GitHub Actions workflow to remind updating this file when specs change.
 
+---After menu website demo completion
+
 ---
+
+## 📅 Recent Activity
+
+### 2025-11-25
+
+**API Repository (PR #1 - 5 commits):**
+
+- ✅ Complete Docker Compose setup (PostgreSQL, Redis, NestJS, Python AI)
+- ✅ PostgreSQL init scripts with RLS helper functions
+- ✅ Database migration structure and guidelines
+- ✅ Seed data patterns with Vietnamese examples
+- ✅ Comprehensive .env.example with all configurations
+- ✅ SPEC_LINKS.md, GitHub templates, CODEOWNERS
+
+**Menu Repository (PR #1 - 4 commits):**
+
+- ✅ Next.js 16.0.4 with React 18.3.1 (latest security fixes)
+- ✅ Tailwind CSS 3.4 with Vietnamese design tokens
+- ✅ Static export configuration for Vercel
+- ✅ Vietnamese locale (vi-VN) setup in root layout
+- ✅ VND price formatting utility class
+- ✅ TypeScript strict mode + VS Code Tailwind IntelliSense
+- ✅ Welcome page with Vietnamese content
+
+**Contracts Repository (PR #1 - 5 commits):**
+
+- ✅ Comprehensive SPEC_LINKS.md with curated references
+- ✅ DEVELOPMENT.md guide with workflows and testing
+- ✅ GitHub templates (PR, bug report, feature request)
+- ✅ CODEOWNERS for contracts team
+- ✅ Repository-specific Copilot instructions
+- ✅ Enhanced README with platform overview and examples
+
+**Next Priorities:**
+
+- 🎯 Implement menu display pages (customer-facing)
+- 🎯 Add Vietnamese currency formatting (75.000₫)
+- 🎯 Start NestJS project setup in API repository
+- 🎯 Create database schema migration
+- 🔴 Initialize mobile repository (pending)
 
 ## 📊 Component Dependencies
 
