@@ -1420,6 +1420,659 @@ export class GrpcAiService implements OnModuleInit {
 
 ---
 
+## Database Setup
+
+### TypeORM Migrations
+
+Configure TypeORM CLI in `package.json`:
+
+```json
+{
+  "scripts": {
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:generate": "npm run typeorm migration:generate -- -d src/config/typeorm.config.ts",
+    "migration:run": "npm run typeorm migration:run -- -d src/config/typeorm.config.ts",
+    "migration:revert": "npm run typeorm migration:revert -- -d src/config/typeorm.config.ts",
+    "seed": "ts-node src/database/seeds/run-seeds.ts"
+  }
+}
+```
+
+**Generate and run migrations:**
+
+```bash
+# Generate migration from entities
+npm run migration:generate -- -n CreateCoreTables
+
+# Run pending migrations
+npm run migration:run
+
+# Revert last migration (if needed)
+npm run migration:revert
+```
+
+**Example Migration: Core Tables:**
+
+**`backend/src/database/migrations/1700000000001-CreateCoreTables.ts`**
+
+```typescript
+import { MigrationInterface, QueryRunner } from 'typeorm';
+
+export class CreateCoreTables1700000000001 implements MigrationInterface {
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    // Tenants table
+    await queryRunner.query(`
+      CREATE TABLE tenants (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        business_name VARCHAR(255) NOT NULL,
+        slug VARCHAR(100) UNIQUE NOT NULL,
+        phone VARCHAR(50),
+        email VARCHAR(255),
+        status VARCHAR(20) DEFAULT 'active',
+        subscription_tier VARCHAR(50) DEFAULT 'free',
+        trial_ends_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP,
+        CONSTRAINT slug_format CHECK (slug ~ '^[a-z0-9-]+$')
+      );
+      CREATE INDEX idx_tenants_slug ON tenants(slug) WHERE deleted_at IS NULL;
+    `);
+
+    // Users table
+    await queryRunner.query(`
+      CREATE TYPE user_role_enum AS ENUM ('owner', 'admin', 'staff');
+      
+      CREATE TABLE users (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+        phone VARCHAR(50) UNIQUE NOT NULL,
+        phone_verified_at TIMESTAMP NOT NULL,
+        full_name VARCHAR(255) NOT NULL,
+        role user_role_enum DEFAULT 'owner',
+        status VARCHAR(20) DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP
+      );
+      CREATE INDEX idx_users_tenant_id ON users(tenant_id) WHERE deleted_at IS NULL;
+      CREATE INDEX idx_users_phone ON users(phone) WHERE deleted_at IS NULL;
+    `);
+
+    // Locations table
+    await queryRunner.query(`
+      CREATE TABLE locations (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+        location_name VARCHAR(255) NOT NULL,
+        slug VARCHAR(100) NOT NULL,
+        address TEXT NOT NULL,
+        city VARCHAR(100),
+        province VARCHAR(100),
+        phone VARCHAR(50),
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP,
+        CONSTRAINT unique_tenant_slug UNIQUE (tenant_id, slug)
+      );
+      CREATE INDEX idx_locations_tenant_id ON locations(tenant_id, is_active) WHERE deleted_at IS NULL;
+    `);
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`DROP TABLE IF EXISTS locations CASCADE;`);
+    await queryRunner.query(`DROP TABLE IF EXISTS users CASCADE;`);
+    await queryRunner.query(`DROP TYPE IF EXISTS user_role_enum;`);
+    await queryRunner.query(`DROP TABLE IF EXISTS tenants CASCADE;`);
+  }
+}
+```
+
+**Note:** Generate separate migrations for menu tables, subscriptions, and integrations. See [database-schema.md](./database-schema.md) for complete table definitions.
+
+### Row-Level Security (RLS)
+
+Enable multi-tenant data isolation at the database level:
+
+**`backend/src/database/migrations/1700000000010-EnableRLS.ts`**
+
+```typescript
+import { MigrationInterface, QueryRunner } from 'typeorm';
+
+export class EnableRLS1700000000010 implements MigrationInterface {
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    // Enable RLS on menu_items
+    await queryRunner.query(`
+      ALTER TABLE menu_items ENABLE ROW LEVEL SECURITY;
+      
+      CREATE POLICY tenant_isolation ON menu_items
+        FOR ALL
+        TO PUBLIC
+        USING (tenant_id = current_setting('app.current_tenant_id', true)::UUID);
+    `);
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`DROP POLICY IF EXISTS tenant_isolation ON menu_items;`);
+    await queryRunner.query(`ALTER TABLE menu_items DISABLE ROW LEVEL SECURITY;`);
+  }
+}
+```
+
+**Set tenant context in NestJS middleware:**
+
+```typescript
+// backend/src/common/middleware/tenant-context.middleware.ts
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+import { getConnection } from 'typeorm';
+
+@Injectable()
+export class TenantContextMiddleware implements NestMiddleware {
+  async use(req: Request, res: Response, next: NextFunction) {
+    const tenantId = req.user?.tenantId; // From JWT payload
+    
+    if (tenantId) {
+      await getConnection().query(
+        `SET LOCAL app.current_tenant_id = '${tenantId}'`
+      );
+    }
+    
+    next();
+  }
+}
+```
+
+### Seed Data
+
+**`backend/src/database/seeds/run-seeds.ts`**
+
+```typescript
+import { DataSource } from 'typeorm';
+import { Tenant } from '../entities/tenant.entity';
+import { User } from '../entities/user.entity';
+import { Location } from '../entities/location.entity';
+import { Menu } from '../entities/menu.entity';
+import { Category } from '../entities/category.entity';
+import { MenuItem } from '../entities/menu-item.entity';
+import { SubscriptionPlan } from '../entities/subscription-plan.entity';
+
+async function runSeeds() {
+  const dataSource = new DataSource({
+    type: 'postgres',
+    host: process.env.DATABASE_HOST || 'localhost',
+    port: parseInt(process.env.DATABASE_PORT) || 5432,
+    username: process.env.DATABASE_USERNAME || 'postgres',
+    password: process.env.DATABASE_PASSWORD || 'postgres',
+    database: process.env.DATABASE_NAME || 'local_store_platform',
+    entities: ['src/database/entities/*.entity.ts'],
+  });
+
+  await dataSource.initialize();
+
+  // Subscription Plans
+  const plans = await dataSource.getRepository(SubscriptionPlan).save([
+    { name: 'starter', display_name_vi: 'Gói Miễn Phí', price_vnd: 0, max_menu_items: 20 },
+    { name: 'growth', display_name_vi: 'Gói Phát Triển', price_vnd: 300000, max_menu_items: null },
+    { name: 'pro', display_name_vi: 'Gói Chuyên Nghiệp', price_vnd: 800000, max_menu_items: null },
+  ]);
+
+  // Sample Tenant
+  const tenant = await dataSource.getRepository(Tenant).save({
+    business_name: 'Phở Hà Nội 24',
+    slug: 'pho-ha-noi-24',
+    phone: '0901234567',
+    email: 'contact@phohanoi24.vn',
+    subscription_tier: 'free',
+  });
+
+  // Sample User (Owner)
+  const user = await dataSource.getRepository(User).save({
+    tenant_id: tenant.id,
+    phone: '0901234567',
+    phone_verified_at: new Date(),
+    full_name: 'Nguyễn Văn An',
+    role: 'owner',
+  });
+
+  // Sample Locations
+  const locations = await dataSource.getRepository(Location).save([
+    {
+      tenant_id: tenant.id,
+      location_name: 'Phở Hà Nội 24 - Quận 1',
+      slug: 'quan-1',
+      address: '123 Nguyễn Huệ, Quận 1',
+      city: 'Ho Chi Minh City',
+      province: 'Ho Chi Minh',
+      phone: '0281234567',
+      is_active: true,
+    },
+    {
+      tenant_id: tenant.id,
+      location_name: 'Phở Hà Nội 24 - Quận 3',
+      slug: 'quan-3',
+      address: '456 Lê Văn Sỹ, Quận 3',
+      city: 'Ho Chi Minh City',
+      province: 'Ho Chi Minh',
+      phone: '0281234568',
+      is_active: true,
+    },
+  ]);
+
+  // Sample Menu
+  const menu = await dataSource.getRepository(Menu).save({
+    tenant_id: tenant.id,
+    name_vi: 'Thực Đơn Chính',
+    name_en: 'Main Menu',
+    is_active: true,
+  });
+
+  // Sample Categories
+  const categories = await dataSource.getRepository(Category).save([
+    { tenant_id: tenant.id, menu_id: menu.id, name_vi: 'Phở', name_en: 'Pho', display_order: 1 },
+    { tenant_id: tenant.id, menu_id: menu.id, name_vi: 'Đồ Uống', name_en: 'Drinks', display_order: 2 },
+  ]);
+
+  // Sample Menu Items
+  await dataSource.getRepository(MenuItem).save([
+    {
+      tenant_id: tenant.id,
+      category_id: categories[0].id,
+      name_vi: 'Phở Bò Tái',
+      name_en: 'Rare Beef Pho',
+      description_vi: 'Phở bò tái mềm, nước dùng thanh ngọt',
+      base_price: 75000,
+      currency_code: 'VND',
+      status: 'published',
+    },
+    {
+      tenant_id: tenant.id,
+      category_id: categories[0].id,
+      name_vi: 'Phở Gà',
+      name_en: 'Chicken Pho',
+      description_vi: 'Phở gà thơm ngon, thanh đạm',
+      base_price: 70000,
+      currency_code: 'VND',
+      status: 'published',
+    },
+    {
+      tenant_id: tenant.id,
+      category_id: categories[1].id,
+      name_vi: 'Cà Phê Sữa Đá',
+      name_en: 'Iced Milk Coffee',
+      description_vi: 'Cà phê phin truyền thống với sữa đặc',
+      base_price: 25000,
+      currency_code: 'VND',
+      status: 'published',
+    },
+    {
+      tenant_id: tenant.id,
+      category_id: categories[1].id,
+      name_vi: 'Trà Đá',
+      name_en: 'Iced Tea',
+      description_vi: 'Trà đá miễn phí',
+      base_price: 0,
+      currency_code: 'VND',
+      status: 'published',
+    },
+  ]);
+
+  console.log('✅ Seeds loaded successfully!');
+  await dataSource.destroy();
+}
+
+runSeeds().catch(console.error);
+```
+
+### Local Database Initialization
+
+**Quick setup:**
+
+```bash
+# 1. Start PostgreSQL and Redis
+docker-compose up -d postgres redis
+
+# 2. Wait for PostgreSQL to be ready (10 seconds)
+sleep 10
+
+# 3. Run migrations
+cd backend
+npm run migration:run
+
+# 4. Load seed data
+npm run seed
+
+# 5. Verify data
+docker exec -it lsp-postgres psql -U postgres -d local_store_platform \
+  -c "SELECT business_name, slug FROM tenants;"
+```
+
+**Expected output:**
+
+```
+  business_name   |      slug
+------------------+----------------
+ Phở Hà Nội 24    | pho-ha-noi-24
+```
+
+**Troubleshooting:**
+
+```bash
+# Check PostgreSQL logs
+docker-compose logs postgres
+
+# Reset database (⚠️ deletes all data)
+docker exec -it lsp-postgres psql -U postgres -c "DROP DATABASE local_store_platform; CREATE DATABASE local_store_platform;"
+npm run migration:run
+npm run seed
+```
+
+---
+
+## Testing Strategy
+
+### Unit Testing - NestJS (Jest)
+
+**Test AuthService OTP Flow:**
+
+**`backend/src/modules/auth/auth.service.spec.ts`**
+
+```typescript
+import { Test, TestingModule } from '@nestjs/testing';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { AuthService } from './auth.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { User } from '../../database/entities/user.entity';
+import { Tenant } from '../../database/entities/tenant.entity';
+
+describe('AuthService', () => {
+  let service: AuthService;
+  let cacheManager: any;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        AuthService,
+        {
+          provide: getRepositoryToken(User),
+          useValue: { findOne: jest.fn(), create: jest.fn(), save: jest.fn() },
+        },
+        {
+          provide: getRepositoryToken(Tenant),
+          useValue: { create: jest.fn(), save: jest.fn() },
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: { get: jest.fn(), set: jest.fn(), del: jest.fn() },
+        },
+        { provide: 'JwtService', useValue: { sign: jest.fn() } },
+        { provide: 'ConfigService', useValue: { get: jest.fn() } },
+      ],
+    }).compile();
+
+    service = module.get<AuthService>(AuthService);
+    cacheManager = module.get(CACHE_MANAGER);
+  });
+
+  it('should generate and store OTP', async () => {
+    const phone = '0901234567';
+    
+    const result = await service.requestOtp(phone);
+    
+    expect(cacheManager.set).toHaveBeenCalledWith(
+      `otp:${phone}`,
+      expect.any(String),
+      expect.any(Number),
+    );
+    expect(result.message).toContain('OTP');
+  });
+
+  it('should verify OTP and return JWT tokens', async () => {
+    const phone = '0901234567';
+    const otp = '123456';
+    
+    cacheManager.get.mockResolvedValue(otp);
+    
+    const result = await service.verifyOtp(phone, otp);
+    
+    expect(cacheManager.del).toHaveBeenCalledWith(`otp:${phone}`);
+    expect(result).toHaveProperty('accessToken');
+    expect(result).toHaveProperty('refreshToken');
+  });
+});
+```
+
+**Test Multi-Tenant Guard:**
+
+**`backend/src/common/guards/tenant.guard.spec.ts`**
+
+```typescript
+import { TenantGuard } from './tenant.guard';
+import { ExecutionContext } from '@nestjs/common';
+
+describe('TenantGuard', () => {
+  let guard: TenantGuard;
+
+  beforeEach(() => {
+    guard = new TenantGuard();
+  });
+
+  it('should allow access when tenant_id matches', () => {
+    const mockContext = {
+      switchToHttp: () => ({
+        getRequest: () => ({
+          user: { tenantId: 'tenant-123' },
+          params: { tenantId: 'tenant-123' },
+        }),
+      }),
+    } as ExecutionContext;
+
+    expect(guard.canActivate(mockContext)).toBe(true);
+  });
+
+  it('should deny access when tenant_id mismatches', () => {
+    const mockContext = {
+      switchToHttp: () => ({
+        getRequest: () => ({
+          user: { tenantId: 'tenant-123' },
+          params: { tenantId: 'tenant-456' },
+        }),
+      }),
+    } as ExecutionContext;
+
+    expect(guard.canActivate(mockContext)).toBe(false);
+  });
+});
+```
+
+### Unit Testing - Python (pytest)
+
+**Test RecommendationService:**
+
+**`ai-service/tests/test_recommendation_service.py`**
+
+```python
+import pytest
+from app.services.recommendation_service import RecommendationService
+from datetime import datetime, timedelta
+
+@pytest.fixture
+def vietnamese_sales_data():
+    """Mock Vietnamese menu sales data"""
+    return [
+        {'item_name': 'Phở Bò Tái', 'quantity': 45, 'revenue': 3375000, 'date': '2025-11-20'},
+        {'item_name': 'Cà phê sữa đá', 'quantity': 78, 'revenue': 1950000, 'date': '2025-11-20'},
+        {'item_name': 'Phở Gà', 'quantity': 12, 'revenue': 840000, 'date': '2025-11-20'},
+    ]
+
+@pytest.mark.asyncio
+async def test_generate_recommendations(vietnamese_sales_data, mocker):
+    """Test rule-based recommendation generation"""
+    service = RecommendationService()
+    
+    # Mock database query
+    mocker.patch.object(
+        service,
+        '_fetch_sales_data',
+        return_value=vietnamese_sales_data
+    )
+    
+    recommendations = await service.generate_recommendations(
+        tenant_id='tenant-123',
+        location_id='location-456',
+        date_range_days=7
+    )
+    
+    assert len(recommendations) > 0
+    assert recommendations[0]['type'] in ['INVENTORY_ALERT', 'DYNAMIC_PRICING', 'PROMOTION']
+    assert 'title' in recommendations[0]
+    assert 'priority' in recommendations[0]
+
+@pytest.mark.asyncio
+async def test_low_stock_alert(vietnamese_sales_data, mocker):
+    """Test low stock recommendation for low-performing items"""
+    service = RecommendationService()
+    
+    # Modify data to trigger low stock alert
+    vietnamese_sales_data[2]['quantity'] = 3  # Phở Gà sells poorly
+    
+    mocker.patch.object(
+        service,
+        '_fetch_sales_data',
+        return_value=vietnamese_sales_data
+    )
+    
+    recommendations = await service.generate_recommendations(
+        tenant_id='tenant-123',
+        location_id='location-456'
+    )
+    
+    low_stock_recs = [r for r in recommendations if r['type'] == 'INVENTORY_ALERT']
+    assert len(low_stock_recs) > 0
+```
+
+### Integration Testing - NestJS (Supertest)
+
+**E2E Authentication Flow:**
+
+**`backend/test/auth.e2e-spec.ts`**
+
+```typescript
+import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { AppModule } from '../src/app.module';
+
+describe('Authentication Flow (e2e)', () => {
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    await app.init();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('Complete OTP authentication flow', async () => {
+    const phone = '0901234567';
+    let accessToken: string;
+
+    // Step 1: Request OTP
+    const otpResponse = await request(app.getHttpServer())
+      .post('/api/v1/auth/otp/request')
+      .send({ phone })
+      .expect(200);
+
+    expect(otpResponse.body.data.message).toContain('OTP');
+
+    // Step 2: Verify OTP (use test OTP in development)
+    const verifyResponse = await request(app.getHttpServer())
+      .post('/api/v1/auth/otp/verify')
+      .send({ phone, otp: '123456' }) // Test OTP
+      .expect(200);
+
+    expect(verifyResponse.body.data).toHaveProperty('accessToken');
+    accessToken = verifyResponse.body.data.accessToken;
+
+    // Step 3: Authenticated request
+    await request(app.getHttpServer())
+      .get('/api/v1/locations')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+  });
+});
+```
+
+### Test Commands
+
+**NestJS (Backend):**
+
+```bash
+# Unit tests
+npm test
+
+# Watch mode
+npm run test:watch
+
+# E2E tests
+npm run test:e2e
+
+# Coverage report (target: >80% for critical paths)
+npm run test:cov
+```
+
+**Python (AI Service):**
+
+```bash
+# All tests
+pytest
+
+# Specific test file
+pytest tests/test_recommendation_service.py
+
+# With coverage
+pytest --cov=app --cov-report=html
+
+# Verbose output
+pytest -v
+```
+
+**Coverage Targets:**
+
+- **Critical paths**: >80% (auth, multi-tenancy, payment processing)
+- **Business logic**: >70% (recommendations, analytics)
+- **Overall**: >60%
+
+### CI Integration
+
+Tests run automatically on GitHub Actions:
+
+```yaml
+# .github/workflows/test.yml
+name: Tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run NestJS tests
+        run: cd backend && npm test
+      - name: Run Python tests
+        run: cd ai-service && pytest
+```
+
+**Load Testing:** Use k6 or Apache JMeter for performance validation (100+ concurrent users, <500ms p95 target).
+
+---
+
 ## Docker Development Environment
 
 **`docker-compose.yml`**
@@ -1594,14 +2247,507 @@ docker-compose up --build
 
 ---
 
+## Deployment
+
+### Overview
+
+This deployment guide covers a **single-server MVP setup** optimized for cost-effectiveness during the pilot phase. All services (NestJS API, Python AI, PostgreSQL, and Redis) run as Docker containers on a single EC2 t2.small instance.
+
+**Architecture:**
+
+- **MVP/Dev**: Single EC2 instance (~$20/mo) - suitable for <100 users
+- **Scaling**: Easy migration path to managed RDS/ElastiCache when traffic grows
+
+### Production Docker Setup
+
+**`docker-compose.prod.yml`**
+
+```yaml
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: lsp-postgres-prod
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lsp-prod-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: lsp-redis-prod
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_prod_data:/data
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - lsp-prod-network
+
+  nestjs-api:
+    image: ${DOCKER_REGISTRY}/lsp-backend:${VERSION}
+    container_name: lsp-nestjs-api-prod
+    environment:
+      NODE_ENV: production
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      GRPC_AI_SERVICE_URL: python-ai:5000
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          memory: 256M
+    networks:
+      - lsp-prod-network
+
+  python-ai:
+    image: ${DOCKER_REGISTRY}/lsp-ai-service:${VERSION}
+    container_name: lsp-python-ai-prod
+    environment:
+      ENVIRONMENT: production
+      DATABASE_URL: postgresql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@postgres:5432/${DATABASE_NAME}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 768M
+        reservations:
+          memory: 512M
+    networks:
+      - lsp-prod-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: lsp-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_cache:/var/cache/nginx
+    restart: always
+    depends_on:
+      - nestjs-api
+    networks:
+      - lsp-prod-network
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+  nginx_cache:
+
+networks:
+  lsp-prod-network:
+    driver: bridge
+```
+
+**Multi-stage Production Dockerfile for NestJS:**
+
+```dockerfile
+# backend/Dockerfile
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build
+
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY package*.json ./
+EXPOSE 3000
+CMD ["node", "dist/main"]
+```
+
+**Multi-stage Production Dockerfile for Python:**
+
+```dockerfile
+# ai-service/Dockerfile
+FROM python:3.11-slim AS builder
+WORKDIR /app
+RUN apt-get update && apt-get install -y build-essential
+COPY requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+FROM python:3.11-slim
+WORKDIR /app
+COPY --from=builder /root/.local /root/.local
+COPY . .
+RUN python -m grpc_tools.protoc -I../proto --python_out=./app --grpc_python_out=./app ../proto/ai_service.proto
+ENV PATH=/root/.local/bin:$PATH
+EXPOSE 5000 8000
+CMD ["python", "-m", "app.grpc_server"]
+```
+
+### Environment Configuration
+
+**Production `.env` Checklist:**
+
+```bash
+# ⚠️ Store in secrets manager (AWS Secrets Manager, Vault, etc.)
+
+# Database (PostgreSQL container)
+DATABASE_HOST=postgres  # Docker service name
+DATABASE_PORT=5432
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=<strong-random-password>  # min 32 chars
+DATABASE_NAME=local_store_platform_prod
+
+# Redis (Redis container)
+REDIS_HOST=redis  # Docker service name
+REDIS_PORT=6379
+REDIS_PASSWORD=<strong-random-password>
+
+# JWT (generate with: openssl rand -base64 64)
+JWT_SECRET=<64-char-random-string>
+JWT_ACCESS_EXPIRATION=15m
+JWT_REFRESH_EXPIRATION=30d
+
+# SMS Provider (Production)
+TWILIO_ACCOUNT_SID=<production-twilio-sid>
+TWILIO_AUTH_TOKEN=<production-twilio-token>
+TWILIO_PHONE_NUMBER=<verified-number>
+
+# Payment Gateways
+MOMO_PARTNER_CODE=<momo-partner-code>
+MOMO_ACCESS_KEY=<momo-access-key>
+MOMO_SECRET_KEY=<momo-secret-key>
+ZALOPAY_APP_ID=<zalopay-app-id>
+ZALOPAY_KEY1=<zalopay-key1>
+ZALOPAY_KEY2=<zalopay-key2>
+VNPAY_TMN_CODE=<vnpay-tmn-code>
+VNPAY_HASH_SECRET=<vnpay-hash-secret>
+
+# Firebase FCM
+FIREBASE_PROJECT_ID=<project-id>
+FIREBASE_PRIVATE_KEY=<service-account-private-key>
+FIREBASE_CLIENT_EMAIL=<service-account-email>
+
+# AWS S3
+AWS_REGION=ap-southeast-1
+AWS_ACCESS_KEY_ID=<iam-access-key>
+AWS_SECRET_ACCESS_KEY=<iam-secret-key>
+AWS_S3_BUCKET=lsp-prod-uploads
+
+# Docker Registry (AWS ECR)
+DOCKER_REGISTRY=123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/lsp
+VERSION=latest
+```
+
+### CI/CD Pipeline
+
+**`.github/workflows/deploy.yml`**
+
+```yaml
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Run NestJS tests
+        run: cd backend && npm ci && npm test
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Run Python tests
+        run: cd ai-service && pip install -r requirements.txt && pytest
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Build NestJS Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_REGISTRY }}/lsp-backend:${{ github.sha }} ./backend
+          docker push ${{ secrets.DOCKER_REGISTRY }}/lsp-backend:${{ github.sha }}
+      
+      - name: Build Python AI Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_REGISTRY }}/lsp-ai-service:${{ github.sha }} ./ai-service
+          docker push ${{ secrets.DOCKER_REGISTRY }}/lsp-ai-service:${{ github.sha }}
+      
+      - name: Deploy to AWS EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /opt/local-store-platform
+            export VERSION=${{ github.sha }}
+            docker-compose -f docker-compose.prod.yml pull
+            docker-compose -f docker-compose.prod.yml up -d
+            docker system prune -af
+```
+
+### Hosting - AWS Free Tier Setup (Single-Server MVP)
+
+**1. Launch Single EC2 Instance:**
+
+```bash
+# All-in-one: t2.small (1 vCPU, 2GB RAM - $0.023/hr ~$17/mo)
+# Runs NestJS, Python AI, PostgreSQL, and Redis in Docker
+aws ec2 run-instances \
+  --image-id ami-0c55b159cbfafe1f0 \
+  --instance-type t2.small \
+  --key-name lsp-key \
+  --security-group-ids sg-xxxxxx \
+  --subnet-id subnet-xxxxxx \
+  --block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=30,VolumeType=gp3}' \
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=lsp-mvp-server}]'
+
+# Note: 30GB storage for PostgreSQL data, logs, and Docker images
+```
+
+**2. Install Docker:**
+
+```bash
+# SSH into EC2 instance
+ssh -i lsp-key.pem ubuntu@ec2-instance-ip
+
+# Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker ubuntu
+
+# Install Docker Compose
+sudo apt-get update && sudo apt-get install -y docker-compose-plugin
+
+# Logout and login again for group changes to take effect
+exit
+ssh -i lsp-key.pem ubuntu@ec2-instance-ip
+```
+
+**3. Setup Nginx Reverse Proxy:**
+
+```nginx
+# /etc/nginx/sites-available/lsp
+server {
+    listen 80;
+    server_name api.localstoreplatform.com;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location /socket.io {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
+```
+
+**4. Configure SSL with Let's Encrypt:**
+
+```bash
+# Install Certbot
+sudo apt-get install -y certbot python3-certbot-nginx
+
+# Obtain SSL certificate
+sudo certbot --nginx -d api.localstoreplatform.com
+
+# Auto-renewal is configured automatically
+```
+
+**5. Deploy:**
+
+```bash
+ssh -i lsp-key.pem ubuntu@ec2-instance-ip
+cd /opt/local-store-platform
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+**6. Configure Security Group:**
+
+```bash
+# Allow SSH, HTTP, HTTPS
+aws ec2 authorize-security-group-ingress \
+  --group-id sg-xxxxxx \
+  --ip-permissions \
+    IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges='[{CidrIp=0.0.0.0/0}]' \
+    IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges='[{CidrIp=0.0.0.0/0}]' \
+    IpProtocol=tcp,FromPort=443,ToPort=443,IpRanges='[{CidrIp=0.0.0.0/0}]'
+```
+
+**Note:** PostgreSQL (5432) and Redis (6379) are accessed only via Docker internal network, no external exposure needed.
+
+### Monitoring & Observability
+
+**Prometheus + Grafana:**
+
+- Install via Docker Compose or managed service (e.g., Grafana Cloud)
+- See [Prometheus Node Exporter setup](https://prometheus.io/docs/guides/node-exporter/)
+- Import [NestJS dashboard](https://grafana.com/grafana/dashboards/15496)
+
+**Key Metrics to Track:**
+
+- API response time (p50, p95, p99)
+- Error rate (5xx responses / total requests)
+- gRPC latency (NestJS ↔ Python AI)
+- Database connection pool usage
+- Redis cache hit rate
+- Active WebSocket connections
+
+**Log Aggregation:**
+
+- Use structured JSON logs (Winston for NestJS, Python logging)
+- Ship to ELK Stack, Loki, or managed service (Datadog, New Relic)
+- Set up alerts for error spikes
+
+### Database Migration in Production
+
+**Pre-deployment checklist:**
+
+1. Backup database: `docker exec lsp-postgres-prod pg_dump -U postgres local_store_platform_prod > backup_$(date +%Y%m%d_%H%M%S).sql`
+2. Test migrations in staging
+3. Review migration SQL for breaking changes
+4. Schedule maintenance window (if downtime needed)
+
+**Execute migrations:**
+
+```bash
+# SSH into EC2 instance
+ssh -i lsp-key.pem ubuntu@ec2-instance-ip
+
+# Run migrations in container
+docker exec -it lsp-nestjs-api-prod npm run migration:run
+
+# Verify
+docker exec -it lsp-postgres-prod psql -U postgres -d local_store_platform_prod -c "\dt"
+```
+
+**Rollback procedure:**
+
+```bash
+# Revert last migration
+docker exec -it lsp-nestjs-api-prod npm run migration:revert
+
+# Restore from backup (if needed)
+docker exec -i lsp-postgres-prod psql -U postgres -d local_store_platform_prod < backup_YYYYMMDD_HHMMSS.sql
+```
+
+### Production Checklist
+
+Before going live:
+
+- [ ] Environment variables stored in secrets manager (not in `.env` files)
+- [ ] Database credentials rotated and secured
+- [ ] JWT secret generated with strong entropy (64+ chars)
+- [ ] SSL certificates installed and auto-renewal configured
+- [ ] Database migrations executed successfully
+- [ ] Monitoring dashboards operational (Grafana)
+- [ ] Log aggregation configured
+- [ ] Alert rules set up (error rate, latency spikes)
+- [ ] Database backup strategy tested (daily automated backups)
+- [ ] Load testing passed (100+ concurrent users, <500ms p95)
+- [ ] Rollback procedure documented and tested
+- [ ] Rate limiting configured (60 req/min per IP)
+- [ ] CORS origins restricted to production domains
+- [ ] Health check endpoints responding
+- [ ] Docker images scanned for vulnerabilities
+- [ ] Incident response runbook prepared
+
+**Estimated Monthly Cost (AWS Single-Server MVP):**
+
+- EC2 t2.small (1 vCPU, 2GB RAM): ~$17/mo
+  - Runs NestJS, Python AI, PostgreSQL, and Redis in Docker containers
+- EBS Storage (30GB gp3): ~$2.40/mo
+- S3 (5GB): **$0** (Free Tier)
+- Data Transfer: **$0** (1GB/mo Free Tier)
+- **Total: ~$20/mo** for MVP with <100 active users
+
+**Scaling Path:**
+
+When growing beyond 100-200 concurrent users, consider migrating to managed services:
+
+1. **Mid-tier (100-500 users): ~$60-80/mo**
+   - Separate EC2 instances: t3.small for NestJS, t3.medium for Python AI
+   - Keep PostgreSQL and Redis in Docker with regular backups to S3
+
+2. **Production-ready (500+ users): ~$120-150/mo**
+   - RDS db.t3.small: ~$30/mo (automated backups, point-in-time recovery)
+   - ElastiCache t3.small: ~$25/mo (Redis persistence, multi-AZ)
+   - Application Load Balancer: ~$16/mo (high availability, SSL termination)
+   - Separate EC2 instances for each service
+
+**Current Setup Benefits:**
+
+- ✅ Lowest cost for MVP validation
+- ✅ Simple deployment and management
+- ✅ Easy to migrate data to managed services later
+- ✅ All services on same network (low latency)
+
+---
+
 ## Next Steps
 
-1. **Database Migrations**: Create TypeORM migrations for the 23 tables
-2. **GraphQL Schema**: Define complete schema with queries, mutations, subscriptions
-3. **WebSocket Gateway**: Implement Socket.io rooms and broadcasting
-4. **Authentication Guards**: Protect routes with JWT authentication
-5. **Unit Tests**: Write tests for services and resolvers
-6. **Integration Tests**: Test gRPC communication end-to-end
-7. **API Documentation**: Generate Swagger/OpenAPI docs
+1. **GraphQL Schema**: Define complete schema with queries, mutations, subscriptions
+2. **WebSocket Gateway**: Implement Socket.io rooms and broadcasting
+3. **Authentication Guards**: Protect routes with JWT authentication
+4. **API Documentation**: Generate Swagger/OpenAPI docs
+5. **Pilot Launch**: Deploy to staging and onboard first 10 merchants
 
 **Ready to proceed with Sprint 1 implementation!** 🚀

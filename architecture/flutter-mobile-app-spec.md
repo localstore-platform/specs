@@ -86,6 +86,446 @@ dependencies:
 
 ---
 
+## Project Structure
+
+### Complete Directory Tree
+
+```
+owner_mobile_app/
+├── lib/
+│   ├── core/                           # Shared foundation layer
+│   │   ├── api/                        # HTTP client & API configuration
+│   │   │   ├── api_client.dart         # Dio instance with interceptors
+│   │   │   ├── api_interceptor.dart    # Auth token, logging, error handling
+│   │   │   └── api_endpoints.dart      # Centralized endpoint constants
+│   │   ├── constants/                  # Design system & app constants
+│   │   │   ├── app_colors.dart         # Color palette (Vietnamese theme)
+│   │   │   ├── app_text_styles.dart    # Typography definitions
+│   │   │   ├── app_spacing.dart        # Spacing system (4dp base)
+│   │   │   └── app_strings.dart        # Hardcoded strings (Vietnamese)
+│   │   ├── error/                      # Error handling
+│   │   │   ├── app_exception.dart      # Custom exception types
+│   │   │   ├── error_handler.dart      # Global error mapper
+│   │   │   └── error_messages.dart     # User-friendly Vietnamese messages
+│   │   ├── storage/                    # Local persistence
+│   │   │   ├── hive_config.dart        # Hive initialization & adapters
+│   │   │   ├── secure_storage.dart     # Token storage (flutter_secure_storage)
+│   │   │   └── cache_manager.dart      # Metrics & offline data caching
+│   │   ├── utils/                      # Helper utilities
+│   │   │   ├── formatters.dart         # VN currency, date/time formatters
+│   │   │   ├── validators.dart         # Phone, input validation
+│   │   │   └── logger.dart             # Logging utility
+│   │   └── widgets/                    # Reusable UI components
+│   │       ├── app_button.dart         # Primary/secondary/text buttons
+│   │       ├── phone_input.dart        # Vietnamese phone input
+│   │       ├── empty_state.dart        # Empty list states
+│   │       ├── error_widget.dart       # Error display with retry
+│   │       ├── shimmer_loading.dart    # Skeleton loading states
+│   │       └── app_bottom_nav.dart     # Bottom navigation bar
+│   │
+│   ├── features/                       # Feature modules (Clean Architecture)
+│   │   ├── auth/                       # Authentication & onboarding
+│   │   │   ├── data/
+│   │   │   │   ├── models/
+│   │   │   │   │   ├── otp_request.dart        # Request DTOs
+│   │   │   │   │   ├── otp_request.g.dart      # JSON serialization
+│   │   │   │   │   ├── auth_response.dart      # Response DTOs
+│   │   │   │   │   └── auth_response.g.dart
+│   │   │   │   ├── auth_api.dart               # Retrofit API interface
+│   │   │   │   ├── auth_api.g.dart             # Generated API client
+│   │   │   │   └── auth_repository.dart        # Data layer logic
+│   │   │   ├── domain/
+│   │   │   │   ├── models/
+│   │   │   │   │   ├── user.dart               # Domain entities
+│   │   │   │   │   ├── user.freezed.dart       # Immutable models
+│   │   │   │   │   └── user.g.dart
+│   │   │   │   └── use_cases/
+│   │   │   │       ├── login_with_otp.dart     # Business logic
+│   │   │   │       └── logout.dart
+│   │   │   └── presentation/
+│   │   │       ├── providers/
+│   │   │       │   ├── auth_provider.dart      # Riverpod state
+│   │   │       │   └── current_user_provider.dart
+│   │   │       ├── screens/
+│   │   │       │   ├── phone_input_screen.dart
+│   │   │       │   └── otp_screen.dart
+│   │   │       └── widgets/
+│   │   │           └── otp_input.dart          # Custom OTP widget
+│   │   │
+│   │   ├── dashboard/                  # Home dashboard
+│   │   │   ├── data/
+│   │   │   │   ├── models/
+│   │   │   │   │   ├── dashboard_metrics.dart  # API response models
+│   │   │   │   │   └── dashboard_metrics.g.dart
+│   │   │   │   ├── dashboard_api.dart
+│   │   │   │   ├── dashboard_api.g.dart
+│   │   │   │   └── dashboard_repository.dart
+│   │   │   ├── domain/
+│   │   │   │   └── models/
+│   │   │   │       ├── metric_card.dart        # UI domain models
+│   │   │   │       └── metric_card.freezed.dart
+│   │   │   └── presentation/
+│   │   │       ├── providers/
+│   │   │       │   ├── today_metrics_provider.dart
+│   │   │       │   └── selected_location_provider.dart
+│   │   │       ├── screens/
+│   │   │       │   └── dashboard_screen.dart
+│   │   │       └── widgets/
+│   │   │           ├── metric_card.dart
+│   │   │           ├── top_selling_items.dart
+│   │   │           └── revenue_trend_chart.dart
+│   │   │
+│   │   ├── recommendations/            # AI recommendations
+│   │   │   ├── data/
+│   │   │   │   ├── models/
+│   │   │   │   │   ├── recommendation.dart     # Vietnamese properties
+│   │   │   │   │   └── recommendation.g.dart   # title, description in VN
+│   │   │   │   ├── recommendations_api.dart
+│   │   │   │   └── recommendations_repository.dart
+│   │   │   ├── domain/
+│   │   │   │   └── models/
+│   │   │   │       └── recommendation_priority.dart  # Enum: critical, high, normal
+│   │   │   └── presentation/
+│   │   │       ├── providers/
+│   │   │       │   └── recommendations_provider.dart
+│   │   │       ├── screens/
+│   │   │       │   ├── recommendations_screen.dart
+│   │   │       │   └── recommendation_detail_screen.dart
+│   │   │       └── widgets/
+│   │   │           ├── recommendation_card.dart
+│   │   │           └── priority_badge.dart
+│   │   │
+│   │   ├── notifications/              # Push notifications & alerts
+│   │   │   ├── data/
+│   │   │   │   ├── models/
+│   │   │   │   │   ├── notification.dart
+│   │   │   │   │   └── notification.g.dart
+│   │   │   │   ├── notifications_api.dart
+│   │   │   │   └── notifications_repository.dart
+│   │   │   ├── domain/
+│   │   │   │   └── models/
+│   │   │   │       └── notification_type.dart  # Enum: ai_recommendation, alert, summary
+│   │   │   └── presentation/
+│   │   │       ├── providers/
+│   │   │       │   └── notifications_provider.dart
+│   │   │       ├── screens/
+│   │   │       │   └── notifications_screen.dart
+│   │   │       └── widgets/
+│   │   │           └── notification_card.dart
+│   │   │
+│   │   └── locations/                  # Multi-location management
+│   │       ├── data/
+│   │       │   ├── models/
+│   │       │   │   ├── location.dart   # Vietnamese address fields
+│   │       │   │   └── location.g.dart
+│   │       │   ├── locations_api.dart
+│   │       │   └── locations_repository.dart
+│   │       └── presentation/
+│   │           ├── providers/
+│   │           │   └── locations_provider.dart
+│   │           └── widgets/
+│   │               └── location_dropdown.dart  # Chain shop selector
+│   │
+│   ├── config/                         # Environment configuration
+│   │   ├── environment.dart            # Dev/staging/prod configs
+│   │   └── firebase_options.dart       # Generated by FlutterFire CLI
+│   │
+│   ├── main.dart                       # Production entry point
+│   ├── main_dev.dart                   # Development entry point
+│   └── main_prod.dart                  # Production entry point (explicit)
+│
+├── test/                               # Mirror lib/ structure
+│   ├── core/
+│   │   ├── api/
+│   │   │   └── api_client_test.dart
+│   │   └── utils/
+│   │       └── formatters_test.dart    # Test VN currency formatting
+│   ├── features/
+│   │   ├── auth/
+│   │   │   ├── data/
+│   │   │   │   └── auth_repository_test.dart
+│   │   │   └── presentation/
+│   │   │       └── providers/
+│   │   │           └── auth_provider_test.dart
+│   │   └── dashboard/
+│   │       └── presentation/
+│   │           └── screens/
+│   │               └── dashboard_screen_test.dart  # Widget tests
+│   └── test_helpers/
+│       ├── mock_data.dart              # Vietnamese test fixtures
+│       └── mock_providers.dart         # Riverpod mocks
+│
+├── integration_test/                   # End-to-end tests
+│   └── app_test.dart                   # Full flow: login → dashboard
+│
+├── assets/                             # Static resources
+│   ├── images/
+│   │   ├── logo.png
+│   │   └── empty_states/               # Vietnamese empty state illustrations
+│   ├── fonts/                          # Optional: custom Vietnamese fonts
+│   └── translations/                   # Future: i18n JSON files
+│       └── vi_VN.json
+│
+├── android/                            # Android native code
+├── ios/                                # iOS native code
+├── pubspec.yaml                        # Dependencies
+├── analysis_options.yaml               # Linting rules
+└── README.md
+```
+
+### Feature Module Pattern (Clean Architecture)
+
+Each feature follows this structure:
+
+```
+feature_name/
+├── data/              # External data sources (API, local DB)
+│   ├── models/        # DTOs (match API JSON structure exactly)
+│   ├── *_api.dart     # Retrofit interface (@GET, @POST)
+│   └── *_repository.dart  # Implements domain repository interface
+├── domain/            # Business logic (platform-independent)
+│   ├── models/        # Domain entities (app's internal representation)
+│   └── use_cases/     # Business rules (optional for simple CRUD)
+└── presentation/      # UI layer
+    ├── providers/     # Riverpod state management
+    ├── screens/       # Full-page widgets
+    └── widgets/       # Feature-specific components
+```
+
+### **Example: Dashboard Feature**
+
+```dart
+// data/models/dashboard_metrics.dart (API DTO)
+@JsonSerializable()
+class DashboardMetrics {
+  @JsonKey(name: 'location_id')
+  final String locationId;
+  
+  @JsonKey(name: 'revenue')
+  final MetricValue revenue;
+  
+  @JsonKey(name: 'orders')
+  final MetricValue orders;
+  
+  DashboardMetrics({
+    required this.locationId,
+    required this.revenue,
+    required this.orders,
+  });
+  
+  factory DashboardMetrics.fromJson(Map<String, dynamic> json) =>
+      _$DashboardMetricsFromJson(json);
+}
+
+// domain/models/metric_card.dart (UI model)
+@freezed
+class MetricCard with _$MetricCard {
+  const factory MetricCard({
+    required String title,           // "Doanh thu hôm nay"
+    required String value,            // "2,5tr"
+    required double changePercent,    // 15.5
+    required Color color,
+    required IconData icon,
+  }) = _MetricCard;
+}
+
+// presentation/providers/today_metrics_provider.dart
+final todayMetricsProvider = FutureProvider.autoDispose.family<DashboardMetrics, String>(
+  (ref, locationId) async {
+    final repo = ref.watch(dashboardRepositoryProvider);
+    return repo.getTodayMetrics(locationId);
+  },
+);
+
+// presentation/screens/dashboard_screen.dart
+class DashboardScreen extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final metricsAsync = ref.watch(todayMetricsProvider(locationId));
+    
+    return metricsAsync.when(
+      data: (metrics) => DashboardContent(metrics: metrics),
+      loading: () => ShimmerLoading(),
+      error: (error, _) => ErrorWidget(error),
+    );
+  }
+}
+```
+
+### Generated Files Strategy
+
+**Code Generation Tools:**
+
+```yaml
+# pubspec.yaml
+dev_dependencies:
+  build_runner: ^2.4.0
+  json_serializable: ^6.7.0      # @JsonSerializable()
+  freezed: ^2.4.0                # @freezed for immutable models
+  freezed_annotation: ^2.4.0
+  retrofit_generator: ^7.0.0     # @RestApi()
+  hive_generator: ^2.0.0         # @HiveType()
+```
+
+**Generate Command:**
+
+```bash
+# One-time generation
+flutter pub run build_runner build --delete-conflicting-outputs
+
+# Watch mode (auto-regenerate on file changes)
+flutter pub run build_runner watch
+```
+
+**Generated File Types:**
+
+| Pattern | Purpose | Example |
+|---------|---------|---------|
+| `*.g.dart` | JSON serialization | `dashboard_metrics.g.dart` |
+| `*.freezed.dart` | Immutable models with copyWith | `user.freezed.dart` |
+| `*.adapter.g.dart` | Hive type adapters | `cached_metrics.adapter.g.dart` |
+| API client implementation | Retrofit REST client | `auth_api.g.dart` |
+
+**Annotation Examples:**
+
+```dart
+// JSON serialization (data/models)
+@JsonSerializable()
+class Recommendation {
+  @JsonKey(name: 'recommendation_id')
+  final String id;
+  
+  @JsonKey(name: 'title_vn')
+  final String title;  // Already in Vietnamese from API
+  
+  Recommendation({required this.id, required this.title});
+  
+  factory Recommendation.fromJson(Map<String, dynamic> json) =>
+      _$RecommendationFromJson(json);
+}
+
+// Freezed immutable models (domain/models)
+@freezed
+class User with _$User {
+  const factory User({
+    required String id,
+    required String name,
+    required String phone,
+    required Tenant tenant,
+  }) = _User;
+  
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+}
+
+// Hive local storage
+@HiveType(typeId: 0)
+class CachedMetrics extends HiveObject {
+  @HiveField(0)
+  final String locationId;
+  
+  @HiveField(1)
+  final double revenue;
+  
+  CachedMetrics({required this.locationId, required this.revenue});
+}
+
+// Retrofit API client
+@RestApi(baseUrl: "https://api.quanly.ai/v1")
+abstract class DashboardApi {
+  factory DashboardApi(Dio dio) = _DashboardApi;
+  
+  @GET("/locations/{id}/metrics/today")
+  Future<ApiResponse<DashboardMetrics>> getTodayMetrics(
+    @Path("id") String locationId,
+  );
+}
+```
+
+### .gitignore (Generated Files)
+
+```gitignore
+# Generated files (DO NOT commit)
+*.g.dart
+*.freezed.dart
+*.adapter.g.dart
+
+# Exceptions: Keep firebase_options.dart (FlutterFire config)
+!firebase_options.dart
+
+# Build outputs
+build/
+.dart_tool/
+```
+
+### File Naming Conventions
+
+| Type | Convention | Example |
+|------|------------|---------|
+| Screens | `*_screen.dart` | `dashboard_screen.dart` |
+| Widgets | Descriptive noun | `metric_card.dart` |
+| Providers | `*_provider.dart` | `today_metrics_provider.dart` |
+| Repositories | `*_repository.dart` | `dashboard_repository.dart` |
+| Models (data) | Singular noun | `recommendation.dart` |
+| Models (domain) | Singular noun | `user.dart` |
+| APIs | `*_api.dart` | `auth_api.dart` |
+| Constants | `app_*.dart` | `app_colors.dart` |
+| Utilities | Plural noun | `formatters.dart` |
+
+### Environment-Specific Entry Points
+
+```dart
+// lib/main_dev.dart
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Development configuration
+  final config = AppConfig.dev;
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
+  runApp(
+    ProviderScope(
+      overrides: [
+        configProvider.overrideWithValue(config),
+      ],
+      child: MyApp(),
+    ),
+  );
+}
+
+// lib/main_prod.dart
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Production configuration
+  final config = AppConfig.prod;
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
+  // Disable debug prints in production
+  debugPrint = (String? message, {int? wrapWidth}) {};
+  
+  runApp(
+    ProviderScope(
+      overrides: [
+        configProvider.overrideWithValue(config),
+      ],
+      child: MyApp(),
+    ),
+  );
+}
+
+// Run commands
+// flutter run -t lib/main_dev.dart
+// flutter run -t lib/main_prod.dart --release
+```
+
+---
+
 ## State Management: Riverpod
 
 ### Why Riverpod?
@@ -797,6 +1237,572 @@ class RecommendationCard extends StatelessWidget {
     );
   }
 }
+```
+
+---
+
+## UI/UX Guidelines
+
+### Design System
+
+**Color Palette:**
+
+```dart
+// lib/core/constants/app_colors.dart
+class AppColors {
+  // Primary Colors (Vietnamese street food inspired)
+  static const primary = Color(0xFFFF6B35);      // Vibrant orange (cà phê sữa đá)
+  static const primaryDark = Color(0xFFE55528);
+  static const primaryLight = Color(0xFFFF8C61);
+  
+  // Secondary Colors
+  static const secondary = Color(0xFF004E89);     // Deep blue (trust)
+  static const secondaryLight = Color(0xFF1A6FB7);
+  
+  // Semantic Colors
+  static const success = Color(0xFF10B981);       // Green (positive metrics)
+  static const error = Color(0xFFEF4444);         // Red (alerts, declining)
+  static const warning = Color(0xFFF59E0B);       // Amber (moderate priority)
+  static const info = Color(0xFF3B82F6);          // Blue (informational)
+  
+  // Neutral Colors
+  static const background = Color(0xFFF9FAFB);    // Light grey background
+  static const surface = Color(0xFFFFFFFF);       // White cards
+  static const border = Color(0xFFE5E7EB);        // Light grey borders
+  
+  // Text Colors
+  static const textPrimary = Color(0xFF111827);   // Near black
+  static const textSecondary = Color(0xFF6B7280); // Grey
+  static const textDisabled = Color(0xFF9CA3AF);  // Light grey
+}
+```
+
+**Typography:**
+
+```dart
+// lib/core/constants/app_text_styles.dart
+class AppTextStyles {
+  // Font Family (supports Vietnamese diacritics)
+  static const fontFamily = 'Roboto'; // Or 'SF Pro' for iOS
+  
+  // Headings
+  static const h1 = TextStyle(
+    fontSize: 28,
+    fontWeight: FontWeight.bold,
+    height: 1.3,
+    letterSpacing: -0.5,
+  );
+  
+  static const h2 = TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    height: 1.3,
+  );
+  
+  static const h3 = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    height: 1.4,
+  );
+  
+  // Body Text
+  static const bodyLarge = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.normal,
+    height: 1.5,
+  );
+  
+  static const body = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    height: 1.5,
+  );
+  
+  static const bodySmall = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.normal,
+    height: 1.4,
+  );
+  
+  // Special
+  static const button = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    height: 1.2,
+  );
+  
+  static const caption = TextStyle(
+    fontSize: 11,
+    fontWeight: FontWeight.normal,
+    height: 1.3,
+    letterSpacing: 0.3,
+  );
+}
+```
+
+**Spacing System:**
+
+```dart
+// lib/core/constants/app_spacing.dart
+class AppSpacing {
+  static const xxs = 4.0;
+  static const xs = 8.0;
+  static const sm = 12.0;
+  static const md = 16.0;
+  static const lg = 24.0;
+  static const xl = 32.0;
+  static const xxl = 48.0;
+  
+  // Common paddings
+  static const screenPadding = EdgeInsets.all(md);
+  static const cardPadding = EdgeInsets.all(md);
+  static const listItemPadding = EdgeInsets.symmetric(horizontal: md, vertical: sm);
+}
+```
+
+### Component Library
+
+**Primary Button:**
+
+```dart
+// lib/core/widgets/app_button.dart
+class AppButton extends StatelessWidget {
+  final String text;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  final AppButtonType type;
+  
+  const AppButton({
+    required this.text,
+    required this.onPressed,
+    this.isLoading = false,
+    this.type = AppButtonType.primary,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 48, // Minimum touch target
+      child: ElevatedButton(
+        onPressed: isLoading ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _getBackgroundColor(),
+          foregroundColor: _getTextColor(),
+          elevation: type == AppButtonType.primary ? 2 : 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+        ),
+        child: isLoading
+            ? SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation(_getTextColor()),
+                ),
+              )
+            : Text(text, style: AppTextStyles.button),
+      ),
+    );
+  }
+  
+  Color _getBackgroundColor() {
+    if (type == AppButtonType.primary) return AppColors.primary;
+    if (type == AppButtonType.secondary) return AppColors.background;
+    return Colors.transparent;
+  }
+  
+  Color _getTextColor() {
+    if (type == AppButtonType.primary) return Colors.white;
+    return AppColors.textPrimary;
+  }
+}
+
+enum AppButtonType { primary, secondary, text }
+```
+
+**Input Field (Phone Number):**
+
+```dart
+// lib/core/widgets/phone_input.dart
+class PhoneInput extends StatelessWidget {
+  final TextEditingController controller;
+  final String? errorText;
+  final VoidCallback? onChanged;
+  
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      keyboardType: TextInputType.phone,
+      decoration: InputDecoration(
+        labelText: 'Số điện thoại',
+        hintText: '0901234567',
+        prefixIcon: Icon(Icons.phone, color: AppColors.textSecondary),
+        errorText: errorText,
+        filled: true,
+        fillColor: AppColors.surface,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.primary, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.error, width: 2),
+        ),
+      ),
+      onChanged: (_) => onChanged?.call(),
+    );
+  }
+}
+```
+
+**Empty State:**
+
+```dart
+// lib/core/widgets/empty_state.dart
+class EmptyState extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String? actionText;
+  final VoidCallback? onAction;
+  
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(AppSpacing.lg),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 64,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            SizedBox(height: AppSpacing.lg),
+            Text(
+              title,
+              style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: AppSpacing.xs),
+            Text(
+              subtitle,
+              style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+            if (actionText != null && onAction != null) ...[
+              SizedBox(height: AppSpacing.lg),
+              AppButton(
+                text: actionText!,
+                onPressed: onAction,
+                type: AppButtonType.secondary,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Navigation Patterns
+
+**Bottom Navigation:**
+
+```dart
+// lib/core/widgets/app_bottom_nav.dart
+class AppBottomNav extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = ref.watch(bottomNavIndexProvider);
+    
+    return BottomNavigationBar(
+      currentIndex: currentIndex,
+      onTap: (index) {
+        ref.read(bottomNavIndexProvider.notifier).state = index;
+      },
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: AppColors.surface,
+      selectedItemColor: AppColors.primary,
+      unselectedItemColor: AppColors.textSecondary,
+      selectedFontSize: 12,
+      unselectedFontSize: 12,
+      items: [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home_outlined),
+          activeIcon: Icon(Icons.home),
+          label: 'Trang chủ',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.auto_awesome_outlined),
+          activeIcon: Icon(Icons.auto_awesome),
+          label: 'AI',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.notifications_outlined),
+          activeIcon: Icon(Icons.notifications),
+          label: 'Thông báo',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.more_horiz),
+          activeIcon: Icon(Icons.menu),
+          label: 'Thêm',
+        ),
+      ],
+    );
+  }
+}
+
+final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
+```
+
+**Hero Animations:**
+
+```dart
+// Animate menu item images between list and detail
+Hero(
+  tag: 'menu_item_${item.id}',
+  child: CachedNetworkImage(
+    imageUrl: item.imageUrl,
+    width: 60,
+    height: 60,
+  ),
+)
+```
+
+### Loading States
+
+**Shimmer Loading (Dashboard Metrics):**
+
+```dart
+// lib/core/widgets/shimmer_loading.dart
+class MetricCardShimmer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        padding: EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            SizedBox(height: AppSpacing.sm),
+            Container(
+              width: 100,
+              height: 24,
+              color: Colors.white,
+            ),
+            SizedBox(height: AppSpacing.xs),
+            Container(
+              width: 60,
+              height: 14,
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+**Pull-to-Refresh:**
+
+```dart
+RefreshIndicator(
+  onRefresh: () async {
+    ref.invalidate(todayMetricsProvider);
+    // Wait for new data
+    await ref.read(todayMetricsProvider(locationId).future);
+  },
+  color: AppColors.primary,
+  child: ListView(...),
+)
+```
+
+### Vietnamese Localization
+
+**Number Formatting:**
+
+```dart
+// lib/core/utils/formatters.dart
+import 'package:intl/intl.dart';
+
+class VNFormatters {
+  // Currency: 75.000₫
+  static String currency(num amount) {
+    final formatter = NumberFormat.currency(
+      locale: 'vi_VN',
+      symbol: '₫',
+      decimalDigits: 0,
+    );
+    return formatter.format(amount);
+  }
+  
+  // Compact: 1,2tr (1.2 million), 450k (450 thousand)
+  static String compactCurrency(num amount) {
+    if (amount >= 1000000000) {
+      return '${(amount / 1000000000).toStringAsFixed(1)}tỷ';
+    } else if (amount >= 1000000) {
+      return '${(amount / 1000000).toStringAsFixed(1)}tr';
+    } else if (amount >= 1000) {
+      return '${(amount / 1000).toStringAsFixed(0)}k';
+    }
+    return currency(amount);
+  }
+  
+  // Percentage: +15,5%
+  static String percentage(double value) {
+    final sign = value >= 0 ? '+' : '';
+    final formatter = NumberFormat('#,##0.0', 'vi_VN');
+    return '$sign${formatter.format(value)}%';
+  }
+}
+```
+
+**Date/Time Formatting:**
+
+```dart
+// lib/core/utils/formatters.dart
+class VNDateFormatters {
+  // Full date: "Thứ 2, 25/11/2025"
+  static String fullDate(DateTime date) {
+    final weekday = ['CN', 'Hai', 'Ba', 'Tư', 'Năm', 'Sáu', 'Bảy'][date.weekday % 7];
+    final formatted = DateFormat('dd/MM/yyyy', 'vi_VN').format(date);
+    return 'Thứ $weekday, $formatted';
+  }
+  
+  // Relative: "2 giờ trước", "Hôm qua"
+  static String relative(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+    
+    if (difference.inMinutes < 1) return 'Vừa xong';
+    if (difference.inHours < 1) return '${difference.inMinutes} phút trước';
+    if (difference.inDays < 1) return '${difference.inHours} giờ trước';
+    if (difference.inDays == 1) return 'Hôm qua';
+    if (difference.inDays < 7) return '${difference.inDays} ngày trước';
+    
+    return DateFormat('dd/MM/yyyy').format(date);
+  }
+  
+  // Time: "14:30"
+  static String time(DateTime date) {
+    return DateFormat('HH:mm', 'vi_VN').format(date);
+  }
+}
+```
+
+**Text Tone Guidelines:**
+
+```dart
+// Action buttons (use imperatives, friendly)
+'Duyệt ngay'      // Approve now (not 'Phê duyệt' - too formal)
+'Xem chi tiết'    // View details
+'Thử lại'         // Try again
+'Cập nhật'        // Update
+
+// Status labels (concise)
+'Đang xử lý...'   // Processing...
+'Thành công'      // Success
+'Đã hoàn thành'   // Completed
+
+// Empty states (encouraging)
+'Chưa có dữ liệu' // No data yet (not 'Không có dữ liệu' - too negative)
+'Bắt đầu thôi!'   // Let's start!
+```
+
+### Accessibility
+
+**Touch Targets:**
+
+```dart
+// Minimum 48x48dp for all interactive elements
+AppButton(...)  // Already 48dp height
+
+// Small icons need padding
+IconButton(
+  iconSize: 24,
+  padding: EdgeInsets.all(12), // Total: 48x48
+  icon: Icon(Icons.close),
+  onPressed: onClose,
+)
+```
+
+**Color Contrast:**
+
+```dart
+// Text on background (4.5:1 ratio)
+Text(
+  'Doanh thu hôm nay',
+  style: TextStyle(
+    color: AppColors.textPrimary, // #111827 on #FFFFFF = 18.6:1 ✓
+  ),
+)
+
+// White text on primary (4.5:1 ratio)
+ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    backgroundColor: AppColors.primary, // #FF6B35 with white = 3.6:1 ✗
+    // Fix: Use darker primary for text backgrounds
+    backgroundColor: AppColors.primaryDark, // #E55528 with white = 4.8:1 ✓
+  ),
+)
+```
+
+**Screen Reader Labels:**
+
+```dart
+// Semantic labels for icons
+Semantics(
+  label: 'Đóng',
+  button: true,
+  child: IconButton(
+    icon: Icon(Icons.close),
+    onPressed: onClose,
+  ),
+)
+
+// Exclude decorative elements
+Semantics(
+  excludeSemantics: true,
+  child: Container(...), // Decorative background
+)
 ```
 
 ---
