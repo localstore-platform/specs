@@ -54,4 +54,15 @@ These instructions tailor GitHub Copilot to the immediate implementation track: 
 - Provide sample data or seeds tailored to Vietnamese cuisine (e.g., phở, cà phê sữa đá) when demonstrating features.
 - After significant changes, log open questions or follow-ups in the knowledge base.
 
+## Documentation Standards
+- **Markdown linting:** All generated markdown documents MUST pass markdown lint with zero errors. Always include:
+  - Blank lines before and after all headings (MD022)
+  - Blank lines before and after all lists (MD032)
+  - Wrap bare URLs in angle brackets or use proper markdown links (MD034)
+  - No trailing spaces (MD009)
+  - No-emphasis-as-heading (MD036)
+  - Table-column-count (MD056)
+  - Link-fragments (MD051)
+- When creating or editing markdown files, proactively apply these rules to avoid requiring manual fixes.
+
 Use this as your default instruction set until broader multi-market support is resumed.

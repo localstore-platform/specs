@@ -39,9 +39,72 @@ This repository contains all strategic planning, architecture, and design docume
 - [Glossary](./knowledge-base/glossary.md)
 - [Documentation structure guide](./DOCUMENTATION-STRUCTURE.md)
 
-## 🛠 Tech Stack (Planned)
+<!-- Pointer to implementation repo -->
+_Developer artifacts (OpenAPI for codegen, seeds, CI) live in the implementation repository — see `documentation/implementation-repo-README-template.md` for expected layout._
 
-- **Frontend:** Next.js (React) with Tailwind CSS
-- **Backend:** Node.js (NestJS) or Go (Fiber)
-- **Database:** PostgreSQL
-- **Deployment:** Docker, Vercel/Netlify
+## 🛠 Tech Stack
+
+### Client Applications
+- **Mobile (Owner):** Flutter (iOS + Android) - Real-time dashboard, push notifications
+- **Web Portal (Staff):** Next.js + Tailwind CSS - Admin operations, data entry
+
+### Backend Services (Hybrid Architecture)
+- **API Gateway:** NestJS (TypeScript) - GraphQL, WebSocket, REST
+- **AI Service:** Python + FastAPI - ML models, recommendations engine
+- **Communication:** gRPC (backend ↔ AI), GraphQL + WebSocket (client ↔ backend)
+
+### Data & Infrastructure
+- **Database:** PostgreSQL 14+ (multi-tenant with Row-Level Security)
+- **Cache:** Redis 6+ (metrics, sessions, pub/sub)
+- **Storage:** S3-compatible (images, exports)
+- **Deployment:** Docker + Docker Compose (dev), Kubernetes (prod)
+
+> **📖 See [architecture/system-diagram.md](./architecture/system-diagram.md) for complete architecture details**
+
+## 🚀 Getting Started
+
+### For Developers
+
+**Quick Start (30 minutes):**
+```bash
+# Prerequisites: Node.js 20+, Python 3.11+, Docker
+
+# 1. Start database services
+docker-compose up -d
+
+# 2. Setup backend (NestJS)
+cd backend
+npm install
+npm run start:dev
+
+# 3. Setup AI service (Python)
+cd ../ai-service
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python -m app.grpc_server
+
+# 4. Setup mobile app (Flutter)
+cd ../mobile
+flutter pub get
+flutter run
+```
+
+**📖 Full setup guide:** [QUICK-START.md](./QUICK-START.md)
+
+### Implementation Resources
+- **Backend Setup:** [architecture/backend-setup-guide.md](./architecture/backend-setup-guide.md)
+- **GraphQL Schema:** [architecture/graphql-schema.md](./architecture/graphql-schema.md)
+- **Flutter App Spec:** [architecture/flutter-mobile-app-spec.md](./architecture/flutter-mobile-app-spec.md)
+- **Sprint 1 Plan:** [planning/sprint-1-implementation.md](./planning/sprint-1-implementation.md) (4 weeks to MVP)
+
+### For Stakeholders
+
+**Current Status:** Implementation Phase - Sprint 1 (Oct 22 - Nov 19, 2025)
+
+**Sprint 1 Deliverables:**
+- ✅ Phone OTP authentication
+- ✅ Real-time dashboard (revenue, orders, AI recommendations)
+- ✅ Push notifications (iOS + Android)
+- ✅ Multi-location support
+- ✅ AI recommendation engine (rule-based)

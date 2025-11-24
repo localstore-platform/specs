@@ -11,12 +11,14 @@
 **Goal:** Launch AI-powered analytics dashboard for 10 pilot customers (mix of chains + skilled operators) with proven ROI.
 
 **Target Segments:**
+
 - **Segment A:** 5 small chains (2-5 locations each)
 - **Segment B:** 5 skilled operators (chefs/baristas, 1 location each)
 
 ### Core Features (Priority Order)
 
 #### 1. Multi-Location Infrastructure (Weeks 1-4)
+
 **Why First:** Foundation for everything else, serves both segments.
 
 - [ ] **User authentication** (phone OTP primary, Facebook OAuth secondary)
@@ -37,6 +39,7 @@
   - Operating hours, manager info, geo-coordinates
 
 #### 2. AI Analytics Dashboard (Weeks 3-8) - **CORE VALUE (80% focus)**
+
 **Why Critical:** This IS the product. Everything else feeds data into this.
 
 - [ ] **Daily business overview (per location)**
@@ -67,6 +70,7 @@
   - Reminder notifications (end of day)
 
 #### 3. Data Collection Tools (Weeks 5-8) - **15% focus**
+
 **Why Important:** Feeds AI with training data. Not the end product.
 
 - [ ] **Menu management (location-aware)**
@@ -90,6 +94,7 @@
   - Max 5 images per item (Free tier)
 
 #### 4. Basic Storefront (Weeks 7-8) - **5% focus**
+
 **Why Deprioritized:** Data collection endpoint only, not core value.
 
 - [ ] **Minimal storefront publishing**
@@ -104,6 +109,51 @@
   - Upload logo
   - Set primary/secondary colors
   - Site title and tagline
+
+### Phase 1 decision: QR-per-table sessions (POST + cursor GET)
+
+Decision summary:
+
+- Primary data-collection method for Phase 1 will be the QR-per-table session model (mã QR trên bàn). Each printed QR creates a persistent session for that table which remains active until the bill is paid or the session expires. This is the canonical source of item-level events during Phase 1.
+- API pattern for client/server communication: POST writes for events + cursor-based GET for incremental reads (polling). Push (SSE/WebSocket) is deferred to Phase 2 unless pilot requires sub-second updates.
+
+Why this choice:
+
+- Fastest path to pilot: no hardware or vendor contracts needed, minimal onboarding friction for merchants.
+- Robust on low-cost Android/4G: HTTP POST + polling is resilient to intermittent connections and easy to retry with idempotency.
+- Data quality & AI-ready: item_add/item_remove/payment_success events are captured in a normalized event stream, enabling forecasting and item-performance models without waiting for POS integrations.
+
+Key API summary (documented in `architecture/api-specification.md`):
+
+- POST /api/v1/locations/{locationId}/qr-sessions — create session, returns session_id and qr_url.
+- POST /api/v1/locations/{locationId}/sessions/{sessionId}/events — append events (idempotency_key, event_type, items, client_ts).
+- GET /api/v1/locations/{locationId}/sessions/{sessionId}/events?cursor={cursor}&limit=50 — cursor-based incremental fetch of new events.
+- GET /api/v1/locations/{locationId}/sessions/{sessionId} — session snapshot (hydrate UI).
+- POST /api/v1/locations/{locationId}/sessions/{sessionId}/payments — bind payment (gateway or manual) and mark session paid.
+
+Operational rules & acceptance criteria for Phase 1:
+
+- Sessions default TTL: 60 minutes inactivity before automatic expiration; merchants can set shorter TTLs per location.
+- Idempotency: clients must supply an `idempotency_key` for writes; duplicates return same event_id.
+- Payment confirmation: a durable payment (gateway webhook or manual reconciliation entry) must exist before session is marked `paid`.
+- Acceptance for pilot: order_capture_rate ≥ 80% (sessions paid or manually reconciled vs reported totals) and payment_match_rate ≥ 90% for e-wallet flows in staging.
+
+Migration / Phase 2 readiness:
+
+- Keep vendor_raw payload and `session_id` references in the canonical event store to enable future POS reconciliation and dual-write migrations.
+- Implement SKU mapping & mapping console in parallel so when POS adapters are added, historical QR events can be reconciled to POS SKUs without losing fidelity.
+- Design analytics ingestion assuming canonical `session_events` table with `event_seq` (monotonic) so cursor semantics map easily to pub/sub for later push-based real-time.
+
+Pilot timeline & next steps (Phase 1 docs track):
+
+1. Finalize event schema and API docs (this will be in `architecture/api-specification.md`) — Week 0 (done).
+2. Prepare merchant pilot pack (quickstart doc in Vietnamese) and reconciliation UI spec — Week 1.
+3. Pilot onboarding and monitoring (10 stores) — Weeks 2–6, iterate TTL/poll intervals and reconciliation flows.
+4. Evaluate real-time needs: if staff dashboards require sub-second updates, implement SSE/WebSocket + pub/sub in Weeks 7–8, otherwise postpone.
+
+Notes:
+
+- POS integration remains in backlog (Phase 2). QR-first approach preserves a clean migration path and reduces time-to-revenue. See `planning/feature-roadmap.md` POS sections for later phases.
 
 #### 5. Subscription Management (Week 8)
 
@@ -260,6 +310,7 @@
 **Goal:** Expand to Thailand, Indonesia, or Japan after proving Vietnam model.
 
 **Decision Criteria Before Expanding:**
+
 - ✅ Vietnam: 500+ customers, ₫100M+ MRR
 - ✅ Product-market fit proven (NPS >60, <3% churn)
 - ✅ Unit economics positive (LTV:CAC > 3:1)
@@ -268,27 +319,34 @@
 ### Potential Markets (in priority order)
 
 #### 1. Thailand (Highest Priority)
+
 **Why:** Similar to Vietnam, large F&B market, LINE dominance (like Zalo).
+
 - Adapt for Thai language
 - Integrate PromptPay (like MoMo)
 - LINE integration (like Zalo Mini App)
 - Estimated TAM: ~80,000 restaurants
 
 #### 2. Indonesia
+
 **Why:** Massive market (270M people), growing middle class, mobile-first.
+
 - Adapt for Bahasa Indonesia
 - Integrate GoPay, OVO (e-wallets)
 - Partnership with Gojek/Grab
 - Estimated TAM: ~150,000 restaurants
 
 #### 3. Japan (Lowest Priority)
+
 **Why:** High-value market but very different culture, saturated with incumbents.
+
 - Requires complete product redesign (reservation systems, LINE Pay)
 - Strong local competition (Tabelog, Gurunavi)
 - High customer acquisition cost
 - Only pursue if specific partnership opportunity arises
 
 **Features for Japan (if pursued):**
+
 - Reservation system (critical for Japan)
 - LINE integration
 - Japanese payment gateways (PayPay, LINE Pay)
