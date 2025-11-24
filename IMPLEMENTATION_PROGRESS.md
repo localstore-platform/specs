@@ -2,24 +2,40 @@
 
 **Spec Version:** v1.0-specs  
 **Last Updated:** 2025-11-25  
-**Status Overview:** 🔴 Not Started (MVP Planning Phase)
+**Status Overview:** 🔴 Not Started (Development Phase - Menu Web Demo)
 
 Biểu đồ này theo dõi tiến độ implementation của từng phần trong Local Store Platform dựa trên specifications trong repository này.
+
+> **⚠️ STRATEGY REVISION (2025-11-25):** Switched from infrastructure-first to **demo-first approach**.  
+> Focus: Build menu web demo on localhost (Docker Compose) before deploying to AWS.  
+> See [`planning/IMPLEMENTATION_STRATEGY_REVISION.md`](../planning/IMPLEMENTATION_STRATEGY_REVISION.md) for details.
+
+**Development Strategy:**
+
+- 🎯 **Phase 1 Goal:** Working menu website demo (Week 1-2)
+- 🐳 **Environment:** Docker Compose on localhost (PostgreSQL + Redis + Backend)
+- 💰 **Cost:** $0 during development, ~$20/month when deployed to AWS
+- 📱 **Demo Priority:** Menu web > Backend API > Mobile App > AWS Infrastructure
+- ⏸️ **Postponed:** ML Service (until có enough data từ pilot users)
 
 ---
 
 ## 📊 Overall Progress
 
 ```
-Total Progress: ███░░░░░░░░░░░░░░░░░ 15% (3/20 components)
+Total Progress: ███░░░░░░░░░░░░░░░░░ 15% (Documentation Complete)
 
-Phase Status:
-├─ 📋 Documentation   ████████████████████ 100% (Complete)
-├─ 🏗️  Infrastructure  ░░░░░░░░░░░░░░░░░░░░   0% (Not Started)
-├─ 🔧 Backend API      ░░░░░░░░░░░░░░░░░░░░   0% (Not Started)
-├─ 🤖 ML Service       ░░░░░░░░░░░░░░░░░░░░   0% (Not Started)
-├─ 📱 Mobile App       ░░░░░░░░░░░░░░░░░░░░   0% (Not Started)
-└─ 🌐 Web Admin        ░░░░░░░░░░░░░░░░░░░░   0% (Not Started)
+Development Phases (Revised Strategy):
+├─ 📋 Documentation      ████████████████████ 100% ✅ Complete
+├─ 🐳 Local Dev Setup    ░░░░░░░░░░░░░░░░░░░░   0% 🔴 Priority 1
+├─ 🌐 Menu Web (Demo)    ░░░░░░░░░░░░░░░░░░░░   0% 🔴 Priority 1  ← FOCUS
+├─ 🔧 Backend API        ░░░░░░░░░░░░░░░░░░░░   0% 🔴 Priority 2
+├─ 📱 Mobile App         ░░░░░░░░░░░░░░░░░░░░   0% 🔴 Priority 3
+├─ 📊 Basic Analytics    ░░░░░░░░░░░░░░░░░░░░   0% 🔴 Priority 4
+├─ 🏗️  AWS Deploy        ░░░░░░░░░░░░░░░░░░░░   0% ⏸️  Priority 5
+└─ 🤖 ML Service         ░░░░░░░░░░░░░░░░░░░░   0% ⏸️  Future
+
+Strategy: Demo-first with localhost development, postpone cloud infrastructure
 ```
 
 ---
