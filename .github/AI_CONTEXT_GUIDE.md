@@ -20,7 +20,7 @@ When you start working in an implementation repository (e.g., `backend-api`, `mo
    - This file contains curated links to relevant specification sections
    - It specifies which spec version (git tag) the repo is compatible with
 
-2. **Note the spec version** (e.g., `v1.0-specs`)
+2. **Note the spec version** (e.g., `v1.1-specs`)
    - All spec references should use this pinned version
    - Ensures consistency across development
 
@@ -56,7 +56,7 @@ When you start working in an implementation repository (e.g., `backend-api`, `mo
 
    ```
    read_file("docs/SPEC_LINKS.md")
-   → Notes: Spec version is v1.0-specs
+   → Notes: Spec version is v1.1-specs
    → Relevant specs: api-specification.md, database-schema.md
    ```
 
@@ -249,16 +249,16 @@ When you start working in an implementation repository (e.g., `backend-api`, `mo
 Before implementing, confirm:
 
 ```
-Current repo spec version: v1.0-specs
-Spec being referenced: v1.0-specs
+Current repo spec version: v1.1-specs
+Spec being referenced: v1.1-specs
 ✅ Match confirmed
 ```
 
 If mismatch:
 
 ```
-⚠️ Warning: Repo uses v1.0-specs, but you're referencing v1.1-specs
-→ Either update repo's SPEC_LINKS.md or use v1.0-specs
+⚠️ Warning: Repo uses v1.1-specs, but you're referencing v1.1-specs
+→ Either update repo's SPEC_LINKS.md or use v1.1-specs
 ```
 
 ### 2. Follow Spec Exactly

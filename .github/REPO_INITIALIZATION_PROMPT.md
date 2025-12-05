@@ -16,7 +16,7 @@ I need to initialize this new LocalStore Platform implementation repository to w
 - Type: [REPO_TYPE] (e.g., NestJS Backend, Next.js Frontend, Flutter Mobile, TypeScript Contracts)
 - Current state: Fresh repository with only README.md, AGPL-3.0 LICENSE, and .gitignore
 - Spec repository: https://github.com/localstore-platform/specs
-- Spec version: v1.0-specs
+- Spec version: v1.1-specs
 
 **Required Setup:**
 
@@ -57,7 +57,7 @@ Based on the repository type, `docs/SPEC_LINKS.md` should reference these specif
 Please create all necessary files following the patterns established in the specs repository, ensuring:
 - All markdown files pass markdown linting (MD022, MD032, MD034, MD009, MD036)
 - Vietnamese localization is properly configured
-- Links to specs use the v1.0-specs tag
+- Links to specs use the v1.1-specs tag
 - Documentation is concise and actionable
 ```
 
@@ -83,34 +83,34 @@ Please create all necessary files following the patterns established in the spec
 ## Core Specifications
 
 ### Architecture
-- [API Specification](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/api-specification.md)
+- [API Specification](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/api-specification.md)
   - REST endpoints (lines 80-1200)
   - GraphQL schema (lines 1200-1800)
   - gRPC service definitions (lines 1800-2000)
   
-- [Backend Setup Guide](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/backend-setup-guide.md)
+- [Backend Setup Guide](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/backend-setup-guide.md)
   - Development environment (lines 1-200)
   - Docker Compose setup (lines 200-400)
   - Database migrations (lines 400-600)
   - Testing strategy (lines 800-1000)
   - Production deployment (lines 1200-1600)
 
-- [Database Schema](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/database-schema.md)
+- [Database Schema](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/database-schema.md)
   - Core tables (lines 80-500)
   - RLS policies (lines 500-650)
   - Indexes (lines 650-750)
   - Analytics extension (see database-schema-analytics-extension.md)
 
-- [GraphQL Schema](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/graphql-schema.md)
+- [GraphQL Schema](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/graphql-schema.md)
   - Type definitions (lines 1-400)
   - Queries (lines 400-600)
   - Mutations (lines 600-800)
   - Subscriptions (lines 800-900)
 
 ### Implementation
-- [Implementation Roadmap](https://github.com/localstore-platform/specs/blob/v1.0-specs/planning/implementation-roadmap.md)
-- [Sprint 1 Plan](https://github.com/localstore-platform/specs/blob/v1.0-specs/planning/sprint-1-implementation.md)
-- [MVP Acceptance Criteria](https://github.com/localstore-platform/specs/blob/v1.0-specs/planning/mvp-acceptance-criteria.md)
+- [Implementation Roadmap](https://github.com/localstore-platform/specs/blob/v1.1-specs/planning/implementation-roadmap.md)
+- [Sprint 1 Plan](https://github.com/localstore-platform/specs/blob/v1.1-specs/planning/sprint-1-implementation.md)
+- [MVP Acceptance Criteria](https://github.com/localstore-platform/specs/blob/v1.1-specs/planning/mvp-acceptance-criteria.md)
 ```
 
 **Additional Files:**
@@ -139,24 +139,24 @@ Please create all necessary files following the patterns established in the spec
 ## Core Specifications
 
 ### Architecture
-- [API Specification](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/api-specification.md)
+- [API Specification](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/api-specification.md)
   - Menu public endpoints (lines 400-600)
   - QR code session endpoints (lines 900-1000)
 
-- [Database Schema](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/database-schema.md)
+- [Database Schema](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/database-schema.md)
   - Menu items schema (lines 250-350)
   - Categories schema (lines 200-250)
 
 ### Design
-- [Wireframes & UX Flow](https://github.com/localstore-platform/specs/blob/v1.0-specs/design/wireframes-ux-flow.md)
+- [Wireframes & UX Flow](https://github.com/localstore-platform/specs/blob/v1.1-specs/design/wireframes-ux-flow.md)
   - Customer menu views (lines 200-400)
   - Mobile-first design (lines 100-200)
 
-- [Flowchart](https://github.com/localstore-platform/specs/blob/v1.0-specs/design/flowchart.md)
+- [Flowchart](https://github.com/localstore-platform/specs/blob/v1.1-specs/design/flowchart.md)
   - Customer ordering flow (lines 100-300)
 
 ### Market Context
-- [Vietnam Market Strategy](https://github.com/localstore-platform/specs/blob/v1.0-specs/research/vietnam-market-strategy.md)
+- [Vietnam Market Strategy](https://github.com/localstore-platform/specs/blob/v1.1-specs/research/vietnam-market-strategy.md)
   - Mobile optimization requirements
   - 4G performance targets (<2s TTI)
   - Currency formatting (75.000₫)
@@ -189,29 +189,29 @@ Please create all necessary files following the patterns established in the spec
 ## Core Specifications
 
 ### Architecture
-- [Flutter Mobile App Spec](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/flutter-mobile-app-spec.md)
+- [Flutter Mobile App Spec](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/flutter-mobile-app-spec.md)
   - Complete app architecture (entire file - ~2500 lines)
   - Project structure (lines 100-300)
   - Feature specifications (lines 300-1800)
   - UI/UX guidelines (lines 1800-2200)
   - Performance optimization (lines 2200-2400)
 
-- [API Specification](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/api-specification.md)
+- [API Specification](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/api-specification.md)
   - REST endpoints for mobile (lines 80-1200)
   - Authentication (lines 120-280)
   - Dashboard metrics (lines 500-750)
 
-- [GraphQL Schema](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/graphql-schema.md)
+- [GraphQL Schema](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/graphql-schema.md)
   - Queries for dashboard (lines 400-600)
   - Real-time subscriptions (lines 800-900)
 
 ### Design
-- [Wireframes & UX Flow](https://github.com/localstore-platform/specs/blob/v1.0-specs/design/wireframes-ux-flow.md)
+- [Wireframes & UX Flow](https://github.com/localstore-platform/specs/blob/v1.1-specs/design/wireframes-ux-flow.md)
   - Mobile owner dashboard (lines 400-800)
   - Onboarding flow (lines 50-150)
 
 ### Implementation
-- [Sprint 1 Plan](https://github.com/localstore-platform/specs/blob/v1.0-specs/planning/sprint-1-implementation.md)
+- [Sprint 1 Plan](https://github.com/localstore-platform/specs/blob/v1.1-specs/planning/sprint-1-implementation.md)
   - Mobile app tasks (Week 4-6)
 ```
 
@@ -241,19 +241,19 @@ Please create all necessary files following the patterns established in the spec
 ## Core Specifications
 
 ### Architecture
-- [GraphQL Schema](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/graphql-schema.md)
+- [GraphQL Schema](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/graphql-schema.md)
   - Complete schema (entire file)
   - Real-time subscriptions (lines 800-900)
 
-- [API Specification](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/api-specification.md)
+- [API Specification](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/api-specification.md)
   - REST fallback endpoints (lines 80-1200)
   - WebSocket events (lines 1800-2000)
 
-- [Multi-Domain User Management](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/multi-domain-user-management.md)
+- [Multi-Domain User Management](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/multi-domain-user-management.md)
   - Multi-location access control
 
 ### Design
-- [Wireframes & UX Flow](https://github.com/localstore-platform/specs/blob/v1.0-specs/design/wireframes-ux-flow.md)
+- [Wireframes & UX Flow](https://github.com/localstore-platform/specs/blob/v1.1-specs/design/wireframes-ux-flow.md)
   - Admin dashboard views (lines 800-1200)
   - Menu management UI (lines 1200-1500)
 ```
@@ -278,15 +278,15 @@ Please create all necessary files following the patterns established in the spec
 ## Core Specifications
 
 ### Architecture
-- [API Specification](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/api-specification.md)
+- [API Specification](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/api-specification.md)
   - gRPC service definitions (lines 1800-2000)
   - AI recommendation endpoints (lines 800-950)
 
-- [Backend Setup Guide](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/backend-setup-guide.md)
+- [Backend Setup Guide](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/backend-setup-guide.md)
   - Python AI service setup (lines 600-800)
 
 ### Planning
-- [Analytics & AI Strategy](https://github.com/localstore-platform/specs/blob/v1.0-specs/planning/analytics-ai-strategy.md)
+- [Analytics & AI Strategy](https://github.com/localstore-platform/specs/blob/v1.1-specs/planning/analytics-ai-strategy.md)
   - ML model specifications (entire file)
   - Demand forecasting (lines 200-400)
   - Price optimization (lines 400-600)
@@ -311,17 +311,17 @@ Please create all necessary files following the patterns established in the spec
 ## Core Specifications
 
 ### Architecture
-- [API Specification](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/api-specification.md)
+- [API Specification](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/api-specification.md)
   - REST DTOs (lines 80-1200)
 
-- [GraphQL Schema](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/graphql-schema.md)
+- [GraphQL Schema](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/graphql-schema.md)
   - Type definitions (lines 1-400)
 
-- [Database Schema](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/database-schema.md)
+- [Database Schema](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/database-schema.md)
   - Enums and constants (lines 750-850)
 
 ### Documentation
-- [Contract Change Process](https://github.com/localstore-platform/specs/blob/v1.0-specs/documentation/contract-change-process.md)
+- [Contract Change Process](https://github.com/localstore-platform/specs/blob/v1.1-specs/documentation/contract-change-process.md)
 ```
 
 ---
@@ -343,17 +343,17 @@ Please create all necessary files following the patterns established in the spec
 ## Core Specifications
 
 ### Architecture
-- [Backend Setup Guide](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/backend-setup-guide.md)
+- [Backend Setup Guide](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/backend-setup-guide.md)
   - Production deployment (lines 1200-1600)
   - Docker Compose setup (lines 200-400)
 
-- [System Diagram](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/system-diagram.md)
+- [System Diagram](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/system-diagram.md)
   - Infrastructure architecture (entire file)
 
-- [Decision: Hybrid Architecture](https://github.com/localstore-platform/specs/blob/v1.0-specs/architecture/decision-hybrid-architecture.md)
+- [Decision: Hybrid Architecture](https://github.com/localstore-platform/specs/blob/v1.1-specs/architecture/decision-hybrid-architecture.md)
 
 ### Implementation
-- [Implementation Timeline](https://github.com/localstore-platform/specs/blob/v1.0-specs/documentation/implementation-timeline.md)
+- [Implementation Timeline](https://github.com/localstore-platform/specs/blob/v1.1-specs/documentation/implementation-timeline.md)
   - Phase 5: Production deployment (lines 300-400)
 ```
 
@@ -368,7 +368,7 @@ Here's a base template that should be customized for each repository:
 
 This document maps features in this repository to their source specifications in the [specs repository](https://github.com/localstore-platform/specs).
 
-**Spec Version:** [v1.0-specs](https://github.com/localstore-platform/specs/tree/v1.0-specs)
+**Spec Version:** [v1.1-specs](https://github.com/localstore-platform/specs/tree/v1.1-specs)
 
 **Last Updated:** [DATE]
 
@@ -392,20 +392,20 @@ This document maps features in this repository to their source specifications in
 ## Cross-Cutting Concerns
 
 ### Localization
-- [Communication Language Guidelines](https://github.com/localstore-platform/specs/blob/v1.0-specs/knowledge-base/communication-language-guidelines.md)
-- [Glossary](https://github.com/localstore-platform/specs/blob/v1.0-specs/knowledge-base/glossary.md)
+- [Communication Language Guidelines](https://github.com/localstore-platform/specs/blob/v1.1-specs/knowledge-base/communication-language-guidelines.md)
+- [Glossary](https://github.com/localstore-platform/specs/blob/v1.1-specs/knowledge-base/glossary.md)
   - Vietnamese/English term translations
   - Standard terminology
 
 ### Market Context
-- [Vietnam Market Strategy](https://github.com/localstore-platform/specs/blob/v1.0-specs/research/vietnam-market-strategy.md)
+- [Vietnam Market Strategy](https://github.com/localstore-platform/specs/blob/v1.1-specs/research/vietnam-market-strategy.md)
   - Mobile-first requirements
   - Payment integrations (MoMo, ZaloPay, VNPay)
   - Social platform integrations (Zalo, Facebook)
 
 ### Monitoring & Operations
-- [Monitoring Runbook](https://github.com/localstore-platform/specs/blob/v1.0-specs/documentation/monitoring-runbook.md)
-- [Launch Readiness Checklist](https://github.com/localstore-platform/specs/blob/v1.0-specs/documentation/LAUNCH-READINESS.md)
+- [Monitoring Runbook](https://github.com/localstore-platform/specs/blob/v1.1-specs/documentation/monitoring-runbook.md)
+- [Launch Readiness Checklist](https://github.com/localstore-platform/specs/blob/v1.1-specs/documentation/LAUNCH-READINESS.md)
 
 ---
 
@@ -427,7 +427,7 @@ AI assistants should:
 - Load specs **on-demand** using the links above
 - Use line number ranges to minimize context
 - Reference this spec version consistently
-- Follow [AI Context Guide](https://github.com/localstore-platform/specs/blob/v1.0-specs/.github/AI_CONTEXT_GUIDE.md)
+- Follow [AI Context Guide](https://github.com/localstore-platform/specs/blob/v1.1-specs/.github/AI_CONTEXT_GUIDE.md)
 
 **Example:**
 
@@ -461,14 +461,14 @@ Create `.github/copilot-instructions.md` with repository-specific rules:
 ```markdown
 # GitHub Copilot Instructions – [REPO_NAME]
 
-Extends the global instructions from [specs/.github/copilot-instructions.md](https://github.com/localstore-platform/specs/blob/v1.0-specs/.github/copilot-instructions.md).
+Extends the global instructions from [specs/.github/copilot-instructions.md](https://github.com/localstore-platform/specs/blob/v1.1-specs/.github/copilot-instructions.md).
 
 ## Repository Context
 
 - **Repository:** [REPO_NAME]
 - **Type:** [REPO_TYPE]
 - **Tech Stack:** [LIST_STACK]
-- **Spec Version:** v1.0-specs
+- **Spec Version:** v1.1-specs
 - **Spec Links:** See [docs/SPEC_LINKS.md](../docs/SPEC_LINKS.md)
 
 ## Specific Guidelines
@@ -503,8 +503,8 @@ Extends the global instructions from [specs/.github/copilot-instructions.md](htt
 ## Related Documentation
 
 - [Main Specs Repository](https://github.com/localstore-platform/specs)
-- [AI Context Guide](https://github.com/localstore-platform/specs/blob/v1.0-specs/.github/AI_CONTEXT_GUIDE.md)
-- [Spec Changelog](https://github.com/localstore-platform/specs/blob/v1.0-specs/SPEC_CHANGELOG.md)
+- [AI Context Guide](https://github.com/localstore-platform/specs/blob/v1.1-specs/.github/AI_CONTEXT_GUIDE.md)
+- [Spec Changelog](https://github.com/localstore-platform/specs/blob/v1.1-specs/SPEC_CHANGELOG.md)
 ```
 
 ---
@@ -515,7 +515,7 @@ Create `.github/CODEOWNERS`:
 
 ```
 # CODEOWNERS for [REPO_NAME]
-# See: https://github.com/localstore-platform/specs/blob/v1.0-specs/documentation/codeowners-examples.md
+# See: https://github.com/localstore-platform/specs/blob/v1.1-specs/documentation/codeowners-examples.md
 
 # Global owners
 * @[GITHUB_USERNAME]
@@ -533,12 +533,12 @@ README.md @[DOCS_OWNER]
 
 Copy appropriate template from specs repository:
 
-- API: [pr-template-api.md](https://github.com/localstore-platform/specs/blob/v1.0-specs/documentation/pr-template-api.md)
-- Mobile: [pr-template-mobile.md](https://github.com/localstore-platform/specs/blob/v1.0-specs/documentation/pr-template-mobile.md)
-- Web: [pr-template-web.md](https://github.com/localstore-platform/specs/blob/v1.0-specs/documentation/pr-template-web.md)
-- Contracts: [pr-template-contracts.md](https://github.com/localstore-platform/specs/blob/v1.0-specs/documentation/pr-template-contracts.md)
-- Infrastructure: [pr-template-infra.md](https://github.com/localstore-platform/specs/blob/v1.0-specs/documentation/pr-template-infra.md)
-- ML: [pr-template-ml.md](https://github.com/localstore-platform/specs/blob/v1.0-specs/documentation/pr-template-ml.md)
+- API: [pr-template-api.md](https://github.com/localstore-platform/specs/blob/v1.1-specs/documentation/pr-template-api.md)
+- Mobile: [pr-template-mobile.md](https://github.com/localstore-platform/specs/blob/v1.1-specs/documentation/pr-template-mobile.md)
+- Web: [pr-template-web.md](https://github.com/localstore-platform/specs/blob/v1.1-specs/documentation/pr-template-web.md)
+- Contracts: [pr-template-contracts.md](https://github.com/localstore-platform/specs/blob/v1.1-specs/documentation/pr-template-contracts.md)
+- Infrastructure: [pr-template-infra.md](https://github.com/localstore-platform/specs/blob/v1.1-specs/documentation/pr-template-infra.md)
+- ML: [pr-template-ml.md](https://github.com/localstore-platform/specs/blob/v1.1-specs/documentation/pr-template-ml.md)
 
 ---
 
@@ -553,7 +553,7 @@ I need to initialize the LocalStore Platform API repository for spec-driven deve
 
 **Repository:** api
 **Type:** NestJS Backend + Python AI Service
-**Spec Version:** v1.0-specs
+**Spec Version:** v1.1-specs
 **Spec Repo:** https://github.com/localstore-platform/specs
 
 Please create:
@@ -589,7 +589,7 @@ api/
 
 Check that:
 
-- ✅ SPEC_LINKS.md references v1.0-specs with line numbers
+- ✅ SPEC_LINKS.md references v1.1-specs with line numbers
 - ✅ All markdown files pass linting
 - ✅ README links back to specs repository
 - ✅ .env.example has all required variables
@@ -605,7 +605,7 @@ Check that:
 
 ### Issue: SPEC_LINKS.md has broken links
 
-**Solution:** Verify spec version tag exists: `https://github.com/localstore-platform/specs/tree/v1.0-specs`
+**Solution:** Verify spec version tag exists: `https://github.com/localstore-platform/specs/tree/v1.1-specs`
 
 ### Issue: Missing Vietnamese localization
 
@@ -632,5 +632,5 @@ Ensure Vietnamese localization is configured:
 ---
 
 **Created:** 2025-11-25
-**Spec Version:** v1.0-specs
+**Spec Version:** v1.1-specs
 **Last Updated:** This document

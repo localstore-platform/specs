@@ -28,7 +28,7 @@ vietnamese-market, restaurant-tech, saas-platform, multi-tenant
 
 **About:**
 
-- Complete technical specifications (v1.0-specs)
+- Complete technical specifications (v1.1-specs)
 - Architecture decisions and system diagrams
 - Implementation roadmaps and sprint planning
 - Vietnamese market research and strategy
@@ -331,7 +331,7 @@ localstore-platform/
 ## Repository Relationships
 
 ```
-specs (v1.0-specs)
+specs (v1.1-specs)
     ↓ (references in SPEC_LINKS.md)
     ├─ api → contracts
     ├─ menu → contracts
@@ -379,7 +379,7 @@ mobile ← api (GraphQL + REST)
 
 - Follow guidelines in `specs/.github/AI_CONTEXT_GUIDE.md`
 - Load specs on-demand via semantic_search
-- Reference spec version (v1.0-specs) in each repo's SPEC_LINKS.md
+- Reference spec version (v1.1-specs) in each repo's SPEC_LINKS.md
 
 ---
 
@@ -429,5 +429,5 @@ TBD (MIT recommended for maximum adoption)
 ---
 
 **Generated:** 2025-11-25  
-**Spec Version:** v1.0-specs  
+**Spec Version:** v1.1-specs  
 **Last Updated:** This document

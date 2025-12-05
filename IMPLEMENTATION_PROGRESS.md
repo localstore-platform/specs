@@ -1,6 +1,6 @@
 # Implementation Progress Tracker
 
-**Spec Version:** v1.0-specs  
+**Spec Version:** v1.1-specs  
 **Last Updated:** 2025-11-25  
 **Status Overview:** 🔴 Not Started (Development Phase - Menu Web Demo)
 

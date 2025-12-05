@@ -164,7 +164,7 @@ Local Docker → Menu Web Demo → Backend API → Mobile App → AWS Deploy
 1. **Create `backend-api` repo:**
    - Initialize NestJS project
    - Setup Docker Compose
-   - Create docs/SPEC_LINKS.md referencing v1.0-specs
+   - Create docs/SPEC_LINKS.md referencing v1.1-specs
 
 2. **Create `menu-web` repo:**
    - Initialize Next.js 14 project
@@ -188,7 +188,7 @@ Local Docker → Menu Web Demo → Backend API → Mobile App → AWS Deploy
 ## References
 
 **Original Plan:** See [IMPLEMENTATION_PROGRESS.md](IMPLEMENTATION_PROGRESS.md)  
-**Spec Version:** v1.0-specs  
+**Spec Version:** v1.1-specs  
 **Decision Date:** 2025-11-25
 
 **Related Documents:**
