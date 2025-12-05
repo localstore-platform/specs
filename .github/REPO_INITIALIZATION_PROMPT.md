@@ -24,9 +24,10 @@ Please create the following structure to enable AI context loading and spec-driv
 
 1. **Documentation Structure** (`docs/` directory):
    - `SPEC_LINKS.md` - Curated links to relevant specifications from the specs repo
-   - `.github/copilot-instructions.md` - Repository-specific Copilot instructions
+   - `GIT_WORKFLOW.md` - Git workflow instructions (branch naming, commit conventions)
 
 2. **GitHub Configuration** (`.github/` directory):
+   - `copilot-instructions.md` - Repository-specific Copilot instructions
    - `CODEOWNERS` - Define code ownership
    - PR template appropriate for this repository type
    - Issue templates (bug report, feature request)
@@ -454,6 +455,102 @@ read_file(
 
 ---
 
+## GIT_WORKFLOW.md Template
+
+Create `docs/GIT_WORKFLOW.md` with standardized git workflow rules:
+
+```markdown
+    # Git Workflow Instructions
+
+    This document defines the standard git workflow for LocalStore Platform repositories.
+
+    ## Commit Workflow
+
+    When committing changes, follow these rules:
+
+    ### 1. Never Commit Directly to Main
+
+    - **Always** create a new branch for changes
+    - If currently on `main`, checkout to a new branch before committing
+    - Branch naming convention: `<type>/<short-description>`
+      - Examples: `feat/add-menu-api`, `fix/currency-format`, `chore/update-deps`
+
+    ### 2. Branch Naming Types
+
+    | Type | Description |
+    |------|-------------|
+    | `feat` | New feature |
+    | `fix` | Bug fix |
+    | `chore` | Maintenance, dependencies, tooling |
+    | `docs` | Documentation only |
+    | `refactor` | Code refactoring |
+    | `style` | Formatting, styling |
+    | `test` | Adding or updating tests |
+    | `perf` | Performance improvements |
+
+    ### 3. Logical Commits
+
+    - Group related changes into logical commits
+    - Each commit should represent a single logical change
+    - Use conventional commit format for messages:
+
+    ```text
+    <type>: <short description>
+
+    - Detail 1
+    - Detail 2
+    ```
+
+    ### 4. Pull Request Workflow
+
+    After committing:
+
+    1. Push the branch to origin
+    2. Create a PR to `main` branch
+    3. If PR already exists, update the title and description to reflect current changes
+    4. Use the repository's PR template
+
+    ### 5. Commit Message Examples
+
+    ```bash
+    # Good
+    feat: add Vietnamese currency formatting utility
+    fix: correct VND decimal separator
+    chore: migrate from npm to pnpm
+    docs: update API specification links
+
+    # Bad
+    update code
+    fix stuff
+    WIP
+    ```
+
+    ## Quick Reference
+
+    ```bash
+    # Check current branch
+    git branch --show-current
+
+    # Create new branch from main
+    git checkout -b feat/my-feature
+
+    # Stage and commit logically
+    git add <related-files>
+    git commit -m "feat: description"
+
+    # Push and create PR
+    git push -u origin feat/my-feature
+    gh pr create --base main
+    ```
+
+    ## Related
+
+    - [Conventional Commits](https://www.conventionalcommits.org/)
+    - [GitHub Flow](https://guides.github.com/introduction/flow/)
+```
+
+---
+
 ## Copilot Instructions Template
 
 Create `.github/copilot-instructions.md` with repository-specific rules:
@@ -484,6 +581,19 @@ Extends the global instructions from [specs/.github/copilot-instructions.md](htt
 
 ### Vietnamese Localization
 [Repository-specific localization requirements]
+
+## Git Workflow
+
+**IMPORTANT**: Follow the git workflow defined in [docs/GIT_WORKFLOW.md](../docs/GIT_WORKFLOW.md).
+
+Key rules:
+
+- **Never commit directly to main branch**
+- If on main, create a new branch before committing
+- Branch naming: `<type>/<short-description>` (e.g., `feat/add-menu-api`)
+- Commit changes logically (group related changes)
+- After commits, create/update PR to main branch
+- Use conventional commit messages
 
 ## Common Tasks
 
@@ -558,11 +668,12 @@ I need to initialize the LocalStore Platform API repository for spec-driven deve
 
 Please create:
 1. docs/SPEC_LINKS.md with API-relevant specification links
-2. .github/copilot-instructions.md for NestJS/TypeScript conventions
-3. .github/CODEOWNERS
-4. .github/pull_request_template.md (using pr-template-api.md)
-5. .env.example with DATABASE_URL, REDIS_URL, JWT_SECRET
-6. Update README.md with proper description and links
+2. docs/GIT_WORKFLOW.md with git workflow instructions
+3. .github/copilot-instructions.md for NestJS/TypeScript conventions
+4. .github/CODEOWNERS
+5. .github/pull_request_template.md (using pr-template-api.md)
+6. .env.example with DATABASE_URL, REDIS_URL, JWT_SECRET
+7. Update README.md with proper description and links
 
 Use the patterns from specs/.github/REPO_INITIALIZATION_PROMPT.md for the API repository type.
 ```
@@ -578,6 +689,7 @@ api/
 │   ├── CODEOWNERS
 │   └── pull_request_template.md
 ├── docs/
+│   ├── GIT_WORKFLOW.md
 │   └── SPEC_LINKS.md
 ├── .env.example
 ├── .gitignore
