@@ -2,7 +2,7 @@
 
 **Spec Version:** v1.1-specs  
 **Last Updated:** 2025-12-06  
-**Status Overview:** � Sprint 0.5 Near Complete (Menu MVP Ready, Blocked on Deployment)
+**Status Overview:** 🟡 Sprint 0.5 Near Complete (Menu MVP Ready, Blocked on Deployment)
 
 Biểu đồ này theo dõi tiến độ implementation của từng phần trong Local Store Platform dựa trên specifications trong repository này.
 
@@ -23,13 +23,13 @@ Biểu đồ này theo dõi tiến độ implementation của từng phần tron
 ## 📊 Overall Progress
 
 ```
-Total Progress: ████████████░░░░░░░░ 60% (Sprint 0.5 Near Complete)
+Total Progress: █████████████░░░░░░░ 65% (Sprint 0.5 Near Complete)
 
 Repositories (9 total):
 ├─ 📋 specs (docs)       ████████████████████ 100% ✅ Complete
 ├─ 🌐 menu (Next.js)     ████████████████░░░░  80% 🟡 Stories 1.1-4.1 Done, 4.2 Blocked
 ├─ 🔧 api (NestJS)       ████████████████████ 100% ✅ Sprint 0.5 Complete
-├─ 📦 contracts (TS)     ██░░░░░░░░░░░░░░░░░░  10% 🟡 Docs Only
+├─ 📦 contracts (TS)     ████████████████████ 100% ✅ v0.1.0 Published to NPM
 ├─ 📱 mobile (Flutter)   ██░░░░░░░░░░░░░░░░░░  10% 🟡 Docs Only
 ├─ 🎛️  dashboard (Next)   ██░░░░░░░░░░░░░░░░░░  10% 🟡 Docs Only
 ├─ 👨‍💼 web-admin (Next)   █░░░░░░░░░░░░░░░░░░░   5% 🔴 README Only
@@ -41,8 +41,8 @@ Strategy: Demo-first with localhost development, postpone cloud infrastructure
 Current State (2025-12-06):
 ✅ API: Sprint 0.5 COMPLETE - NestJS 11, Menu endpoints, 14 unit tests, 25 API tests
 ✅ Menu: Stories 1.1, 1.2, 3.1, 4.1 COMPLETE - Full menu page, VND formatter, PWA
+✅ Contracts: v0.1.0 PUBLISHED - @localstore/contracts on NPM, 42 unit tests
 ⏸️ Menu Story 4.2: BLOCKED - Waiting for API infrastructure deployment
-✅ Contracts: Full documentation (no TypeScript types yet)
 ✅ Mobile: Flutter README + SPEC_LINKS + Git Workflow (no source code)
 ✅ Dashboard: Next.js README + SPEC_LINKS + Git Workflow (no source code)
 🔴 Web-Admin: README only (internal admin tool)
@@ -65,19 +65,20 @@ Current State (2025-12-06):
 | **2.2** | Menu REST API Endpoints | api | ✅ Complete | 100% |
 | **2.3** | Database Migration & Seeds | api | ✅ Complete | 100% |
 | **3.1** | Frontend-Backend Integration | menu | ✅ Complete | 100% |
-| **3.2** | Shared TypeScript Types | [contracts](https://github.com/localstore-platform/contracts) | 🔴 Not Started | 0% |
+| **3.2** | Shared TypeScript Types | [contracts](https://github.com/localstore-platform/contracts) | ✅ Complete | 100% |
 | **4.1** | Mobile Optimization | menu | ✅ Complete | 100% |
 | **4.2** | Demo Deployment (Vercel) | menu | ⏸️ Blocked | 0% |
 
-**Sprint 0.5 Overall: ~80% Complete** (7/9 stories done, 1 blocked on infra)
+**Sprint 0.5 Overall: ~89% Complete** (8/9 stories done, 1 blocked on infra)
 
 ### Slack Agent Events Summary
 
 | Timestamp | Event | Repository | Status |
 |-----------|-------|------------|--------|
-| Latest | ⏸️ BLOCKED | menu | Story 4.2 waiting for API deployment |
+| Latest | 🚀 PACKAGE_PUBLISHED | contracts | @localstore/contracts@0.1.0 on NPM |
+| Recent | 📦 SCHEMA_UPDATED | contracts | Sprint 0.5 Menu Types & DTOs (PR #3) |
+| Recent | ⏸️ BLOCKED | menu | Story 4.2 waiting for API deployment |
 | Recent | 🎉 SPRINT_COMPLETE | menu | Stories 1.1, 1.2, 3.1, 4.1 done (PR #4) |
-| Recent | ✅ STORY_DONE | menu | Story 4.1 Mobile Optimization |
 | Recent | 📤 API_READY | api | Sprint 0.5 Menu Demo API (PR #3) |
 
 ---
@@ -354,7 +355,7 @@ Current State (2025-12-06):
 
 ---
 
-## �️ Owner Dashboard (Repo: `dashboard`)
+## 🎛️ Owner Dashboard (Repo: `dashboard`)
 
 **Repository:** <https://github.com/localstore-platform/dashboard>
 
@@ -395,7 +396,7 @@ Current State (2025-12-06):
 
 ---
 
-## �‍💼 Platform Admin (Repo: `web-admin`)
+## 👨‍💼 Platform Admin (Repo: `web-admin`)
 
 **Repository:** <https://github.com/localstore-platform/web-admin>
 
@@ -431,9 +432,9 @@ This repository is for platform operators to manage tenants, monitor system heal
 
 ---
 
-## �📦 Shared Contracts (Repo: `contracts`)
+## 📦 Shared Contracts (Repo: `contracts`)
 
-**Repository:** <https://github.com/localstore-platform/contracts>
+**Repository:** <https://github.com/localstore-platform/contracts\>
 
 **Spec References:**
 
@@ -441,7 +442,7 @@ This repository is for platform operators to manage tenants, monitor system heal
 - `architecture/graphql-schema.md`
 - `architecture/database-schema.md`
 
-**Status:** � Documentation Only (No TypeScript types yet)
+**Status:** ✅ Sprint 0.5 Complete - v0.1.0 Published to NPM
 
 ### Repository Setup (Complete)
 
@@ -457,23 +458,37 @@ This repository is for platform operators to manage tenants, monitor system heal
 
 **Setup Progress:** 7/7 (100%)
 
-### TypeScript Types (Not Started)
+### TypeScript Types (Sprint 0.5 Complete)
 
 | Component | Status | Spec Section | Notes |
 |-----------|--------|--------------|-------|
-| Package.json Setup | 🔴 Not Started | - | @localstore/contracts |
-| MenuItem Interface | 🔴 Not Started | database-schema.md:250-350 | Story 3.2 |
-| Category Interface | 🔴 Not Started | database-schema.md:200-250 | Story 3.2 |
-| Location Interface | 🔴 Not Started | database-schema.md:150-200 | Story 3.2 |
-| formatVND() Utility | 🔴 Not Started | - | Story 1.2 |
-| API Response Types | 🔴 Not Started | api-specification.md | REST DTOs |
-| GraphQL Types | 🔴 Not Started | graphql-schema.md | Schema types |
-| Protobuf Definitions | 🔴 Not Started | api-specification.md:1500-1600 | gRPC contracts |
-| Shared Enums | 🔴 Not Started | database-schema.md | Status, priority |
+| Package.json Setup | ✅ Complete | - | @localstore/contracts@0.1.0 on NPM |
+| Menu Entity | ✅ Complete | database-schema.md:250-350 | Story 3.2 |
+| Category Entity | ✅ Complete | database-schema.md:200-250 | Story 3.2 |
+| MenuItem Entity | ✅ Complete | database-schema.md:250-350 | Story 3.2 |
+| ItemVariant Entity | ✅ Complete | database-schema.md | Story 3.2 |
+| ItemAddOn Entity | ✅ Complete | database-schema.md | Story 3.2 |
+| ItemImage Entity | ✅ Complete | database-schema.md | Story 3.2 |
+| Location Entity | ✅ Complete | database-schema.md:150-200 | Story 3.2 |
+| Tenant Entity | ✅ Complete | database-schema.md | Story 3.2 |
+| User Entity | ✅ Complete | database-schema.md | Story 3.2 |
+| PublicMenuResponse DTO | ✅ Complete | api-specification.md | REST DTOs |
+| MenuCategoryDto | ✅ Complete | api-specification.md | REST DTOs |
+| MenuItemDto | ✅ Complete | api-specification.md | REST DTOs |
+| AuthResponse DTO | ✅ Complete | api-specification.md | REST DTOs |
+| formatVND() Utility | ✅ Complete | - | Story 1.2 |
+| parseVND() Utility | ✅ Complete | - | Story 1.2 |
+| formatVNDCompact() | ✅ Complete | - | Story 1.2 |
+| formatDateVN() | ✅ Complete | - | Story 1.2 |
+| getRelativeTimeVN() | ✅ Complete | - | Story 1.2 |
+| ItemStatus Enum | ✅ Complete | database-schema.md | Shared Enums |
+| UserRole Enum | ✅ Complete | database-schema.md | Shared Enums |
+| PaymentMethod Enum | ✅ Complete | database-schema.md | Shared Enums |
+| RecommendationType Enum | ✅ Complete | database-schema.md | Shared Enums |
 
-**Types Progress:** 0/9 (0%)
+**Types Progress:** 23/23 (100%) - 42 unit tests passing
 
-**Contracts Total:** 7/16 (44% setup, 0% types)
+**Contracts Total:** 30/30 (100%)
 
 ---
 
