@@ -60,7 +60,22 @@ After implementation, **update `docs/CURRENT_WORK.md`**:
 3. Run `npm run lint && npm run test && npm run typecheck`
 4. Create PR when story is complete
 
-### Step 7: Report
+### Step 7: Post Event to Slack
+
+After completing a story, post an event to `#agent-events` (channel ID: `C0A1VSFQ9SS`):
+
+```
+📦 SCHEMA_UPDATED from contracts: [Story Title]
+---
+Details: [What types/interfaces were added or changed]
+Affected: [api, menu, mobile, dashboard]
+Action: [Update @localstore/contracts dependency, regenerate types]
+Version: [New package version if published]
+```
+
+Use `slack_post_message` with channel_id `C0A1VSFQ9SS`.
+
+### Step 8: Report
 
 Tell the user:
 
@@ -68,6 +83,19 @@ Tell the user:
 - What was implemented
 - Current status
 - What's next
+- Event posted to Slack
+
+---
+
+## 🔄 "Sync Events" Trigger
+
+When the user says **"sync events"**, **"check events"**, or **"đồng bộ"**:
+
+1. **Read recent messages** from `#agent-events` (channel ID: `C0A1VSFQ9SS`) using `slack_get_channel_history`
+2. **Filter for events affecting this repo** (look for "contracts" in Affected field)
+3. **Report relevant events** to user with recommended actions
+4. **If SPEC_CHANGED from specs** → review and update types accordingly
+5. **If API_READY from api** → ensure response types are defined
 
 ---
 

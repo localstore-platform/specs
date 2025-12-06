@@ -28,8 +28,65 @@ Just say **"continue work"** (or "tiếp tục", "next task") and Copilot will:
 4. Implement the feature
 5. **Update `docs/CURRENT_WORK.md`** with new status
 6. Follow git workflow (branch, commit, PR)
+7. **Post event to Slack** `#agent-events` channel
 
 No copy-paste needed!
+
+---
+
+## 🔄 Cross-Repo Communication (Slack)
+
+Agents communicate via the `#agent-events` Slack channel (ID: `C0A1VSFQ9SS`).
+
+### Event Types
+
+| Emoji | Event | Source Repos | Description |
+|-------|-------|--------------|-------------|
+| 📤 | `API_READY` | api | API endpoint published |
+| 📦 | `SCHEMA_UPDATED` | contracts | Types/interfaces updated |
+| 📝 | `SPEC_CHANGED` | specs | Specification updated |
+| ✅ | `STORY_DONE` | all | Story completed |
+| 🏗️ | `INFRA_UPDATED` | infra | Infrastructure changed |
+| 🤖 | `ML_READY` | ml | ML model ready |
+
+### "Sync Events" Trigger
+
+Say **"sync events"** (or "check events", "đồng bộ") and Copilot will:
+
+1. Read recent messages from `#agent-events`
+2. Filter for events affecting this repo
+3. Report relevant updates with recommended actions
+
+### Example Flow
+
+```
+api completes Menu API
+    ↓
+Posts: "📤 API_READY from api: Menu endpoints"
+    ↓
+You open menu repo, say "sync events"
+    ↓
+menu agent sees API_READY, integrates the endpoints
+```
+
+### MCP Setup Required
+
+The Slack MCP server must be configured in VS Code:
+
+```json
+{
+  "servers": {
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "xoxb-your-token",
+        "SLACK_TEAM_ID": "T09M8DKS3HV"
+      }
+    }
+  }
+}
+```
 
 ---
 
@@ -91,6 +148,7 @@ cp specs/.github/templates/CURRENT_WORK-menu.md menu/docs/CURRENT_WORK.md
 Contains everything Copilot needs to work in that repo:
 
 - **🚀 "Continue Work" Trigger** - Step-by-step instructions for resuming work
+- **🔄 "Sync Events" Trigger** - Check Slack for cross-repo updates
 - **Repository Context** - Purpose, tech stack, deployment
 - **Key Spec Files** - Table of spec files with line numbers
 - **Build & Test Commands** - All commands needed
@@ -130,6 +188,24 @@ cd ~/code/localstore-platform/menu && code .
 #    - Commits code
 #    - Creates PR
 #    - Updates CURRENT_WORK.md: Story 1.1 → ✅ Done
+#    - Posts event to #agent-events Slack channel
+```
+
+### Cross-Repo Sync Example
+
+```bash
+# 1. api repo completed Menu API, posted to Slack
+
+# 2. Open menu repo
+cd ~/code/localstore-platform/menu && code .
+
+# 3. Say "sync events" to Copilot Chat
+
+# 4. Copilot:
+#    - Reads #agent-events channel
+#    - Sees "📤 API_READY from api: Menu endpoints"
+#    - Reports: "API repo published Menu endpoints. Recommend integrating."
+#    - You say "continue work" and it integrates the API
 ```
 
 ---

@@ -61,7 +61,22 @@ After implementation, **update `docs/CURRENT_WORK.md`**:
 3. Run `terraform validate && terraform fmt -check`
 4. Create PR when story is complete
 
-### Step 7: Report
+### Step 7: Post Event to Slack
+
+After completing a story, post an event to `#agent-events` (channel ID: `C0A1VSFQ9SS`):
+
+```
+🏗️ INFRA_UPDATED from infra: [Story Title]
+---
+Details: [What infrastructure was provisioned or changed]
+Affected: [api, menu, dashboard, mobile]
+Action: [Update env vars, redeploy services, etc.]
+Spec: [Link to relevant spec section]
+```
+
+Use `slack_post_message` with channel_id `C0A1VSFQ9SS`.
+
+### Step 8: Report
 
 Tell the user:
 
@@ -69,6 +84,19 @@ Tell the user:
 - What was implemented
 - Current status
 - What's next
+- Event posted to Slack
+
+---
+
+## 🔄 "Sync Events" Trigger
+
+When the user says **"sync events"**, **"check events"**, or **"đồng bộ"**:
+
+1. **Read recent messages** from `#agent-events` (channel ID: `C0A1VSFQ9SS`) using `slack_get_channel_history`
+2. **Filter for events affecting this repo** (look for "infra" in Affected field)
+3. **Report relevant events** to user with recommended actions
+4. **If STORY_DONE from api/menu** → may need deployment pipeline updates
+5. **If SPEC_CHANGED from specs** → review infrastructure requirements
 
 ---
 
